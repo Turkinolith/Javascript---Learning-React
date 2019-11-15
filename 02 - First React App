@@ -1,0 +1,64 @@
+From the command line use the command:
+
+create-react-app appname
+
+This will install React and all the 3rd party libraries we need:
+Development Server
+Webpack for bundling files
+Babel for compiling JS code
+and a bunch of other tools. 
+ZERO CONFIG SETUP!
+
+However, if you want to customise it you can always eject it with the command "npm run eject", this will be looked at in the future.
+
+Once done follow the instructions to CD into the app folder and run "npm start"
+This starts the development server listening on port 3000, gives you local and network info to access it, and launches a browser window
+pointing towards it.
+Tested and verified I can access the data anywhere on my local network, even with my phone!
+This page by default links to "learn React" which has resources and tutorials on using React.
+
+Open the app folder in VS code now so we can begin working in the space there.
+In the folder we see several files and some sub-folders:
+
+[node_modules] 
+  This is the 3rd party libraries including React itself, we should not need to touch this.
+[public] 
+  This has the public assets of our app such as favorite icon, index.html, it has a very simple template. Note in the index.html that
+  further down in it, in the <body> section you see a single <div> with the ID="root". This is where our React application is going to 
+  appear. So this div is the container for our React application.
+[src]
+  Where we have basic components Such as App.js, that component is responsible for rendering the default App page.
+
+**********
+** NOTE **
+**********
+
+One thing I noticed very quickly, was that the instructor example and the default App.js was in different formats.
+The instructior version uses ES6 classes, while the default was in a ES5 functional format.
+On investigation I found out this was an intentional change by the react devs to make the output consistant with their documentation.
+It can be easily refactored into the class version according to the people in the stack overflow notes: https://stackoverflow.com/questions/56297983/create-react-app-generates-function-instead-of-class-in-app-js
+
+******************************
+** JAVASCRIPT XML AND BABEL **
+******************************
+
+'App.js' App() returns a large block of mark-up script.
+This is neither a string nor html, it is JSX which stands for Javascript XML. 
+So we use this syntax which looks very familiar to describe what the UI is going to look like.
+To make this code work, it has to be passed through Babel, which is a modern JS compiler. 
+Babel will take the JSX syntax and convert it into plain JS code.
+To see what that looks like: https://babeljs.io/repl
+You can type in modern JS code and it'll auto-convert it into browser supported JS.
+
+EXAMPLE:  const element = <h1>Hello World</h1>;
+TURNS INTO: "use strict"; var element = React.createElement("h1", null, "Hello World");
+
+Way easier to read and use JSX than type in pure React method format. So, we leave it to babel to convert the code for us.
+
+** BACK TO THE FILES Panel:
+'App.css' - Contains all of the CSS used for the App component, you can see in App.js it is imported on line #3.
+'App.test.js' - A test file. This will be touched on in the Advanced React course. That's something to touch on later.
+'index.js' - The entry point for the app.
+'index.css' - The css used for the index page.
+'logo.svg' - The logo for the app.
+'serviceWorker.js' - Serves files from a local cache in a production environment.
