@@ -1,0 +1,7 @@
+Named and default exports:
+Named exports are explictly defined with the "export" keyword in front of the variable name.
+Adding "default" keyword after export makes that object the main thing exported from the module.
+on the import side, you use curly braces to import a named export.
+IE: import { Teacher } from "./teacher";
+but if it is a default export you don't neeed them.
+IE: import Teacher from "./teacher"
