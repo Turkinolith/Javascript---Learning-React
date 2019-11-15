@@ -5,3 +5,12 @@ on the import side, you use curly braces to import a named export.
 IE: import { Teacher } from "./teacher";
 but if it is a default export you don't neeed them.
 IE: import Teacher from "./teacher"
+
+It's possible to have both a default and named export in the same file
+To import them, you mix them together:
+IE: import Teacher, { promote } from "./teacher";
+
+or: import React, { Component } from 'react'; 
+Note we don't have ./ before react for the path. we use that for our own modules that are part of the project.
+React isn't part of the project, its a 3rd party library stored inside the node modules folder. 
+React is the default export and Component is the named. 
