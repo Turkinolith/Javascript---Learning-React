@@ -1,0 +1,34 @@
+So far I created a basic react app with zero configureation.
+But, sometimes I may want to customise the default config for the project like the Webpack configuration
+
+That is when you use the eject command.
+
+In the package.json file there is a scripts section:
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  
+ Here there are 4 scripts, or commands.
+ Start to start the development webserver.
+ build to build the app for production to get an optimized package
+ test to run unit tests
+ eject, ejects from create react app and customize all the tools and configs that come with the project.
+  The interesting thing here, is if you look at the dependencies section of the package.json:
+  in this case there are only 3 dependencies:
+
+ "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-scripts": "3.2.0"
+  },
+-- React - the main react library
+-- react-dom - library to react with the DOM
+-- react-scripts - library that takes care of starting, building, testing, and ejecting a create react project.
+The interesting thing here is under dependancies there are no references to tools like webpack, babel, so on. All of that 
+complexity is hidden.
+
+If you eject from create-react-app, you will see all of those dependancies will appear under the dependancies section.
+Ejecting is permanent, so don't do it unless you know what you are doing.
