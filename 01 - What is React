@@ -1,0 +1,58 @@
+React is a JS library for building user interfaces.
+Developed at Facebook in 2011.
+The other 2 big players in this space are Angular and Vue
+
+At the heart of all React apps are components, a piece of the UI.
+So building apps with React is a bunch of independant, isolated, and reusable components and recompose them to build complex UI's.
+
+Every React app has at least one component we refer to as the roof component. This represents the entier application and has other
+child components.
+
+So, every React app is essentially a tree of components.
+
+Example: if we want to build an app like Twitter we can split their main page into components like: 
+Nav-bar
+Profile
+Trends
+and Feed.
+
+A tree view, in text would be like:
+                    [App]
+   [Nav Bar] [Profile] [Trends] [Feed]
+                                [Tweet] -Feed for example has Tweet components
+                                [Like]  -Which have like components, that we can reuse on other pages, or in other apps.
+
+Each component is a piece of UI, we can build them in isolation and then put them together to build complex UI's.
+
+// *** IMPLEMENTATION ***
+
+In terms of implementation a component is typicly implemented as a JS Class, often with a state object and render method.
+The state is the data we want to display when the component is rendered and the render method is responsible for describing what the
+UI should look like. 
+The output of the render method is a React Element which is a simple JS object that maps to a DOM Element. 
+Its not a real DOM element, its a JS object that represents that DOM element in memory.
+
+So, React keeps a lightweight representation of the DOM in memory which is refered to as the "Virtual DOM"
+
+Unlike the Browser or Real DOM, the Virutal one is cheap to create. When we change the state of a component we get a new 
+React element.
+React will then compare this element and its children to the previous one it figures out what changed, and then update part of the Real DOM 
+to keep it in sync with the virtual one.
+
+This means unlike vanilla JS or JQUERY we don't have to work with the DOM api in browser, so it doesn't need event handlers or manipulation
+of the DOM. Simply change the state of components and REACT will automaticly update the status of elements to reflect the new state.
+
+REACT REACTS TO STATE CHANGES.
+
+// **********************
+// ** REACT VS ANGULAR **
+// **********************
+
+Both are similar in terms of component base architecture.
+Angular is a Framework, or a complete solution.
+React is a Library, it only takes care of rendering the view and making sure the view is in sync with the state. Thats it.
+Because of this, react has a smaller API to learn.
+
+So, when bulding applications with React you will need to use other libraries for things like routing or calling HTTP services.
+This is not nessisarily a bad thing, because you get to choose the libraries you prefer as opposed to being stuck with
+what Angular gives you.
