@@ -1,3 +1,5 @@
 Some needed tools:
 
-bootstrapper - npm i bootstrapper
+bootstrapper -
+  install - npm i bootstrapper
+  import - (in index.js) - import 'bootstrap/dist/css/bootstrap.css'
