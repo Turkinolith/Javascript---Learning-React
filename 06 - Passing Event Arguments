@@ -1,0 +1,35 @@
+  // EX: lets say that our span is a list of products in a shopping cart. When we click increment we want to pass the ID of a product.
+  // Earlier we found that the onClick cannot call handleIncrement() and pass an argument like 1, it needs to pass a function reference
+  // Here is one solution: define a new method: doHandleIncrement, use arrow function, and call this.handleIncrement with an argument.
+  // Now add a parameter product to the handleIncrement function, finally, change the onClick to reference this.doHandleIncrement instead.
+  // This works, but it is messy. We don't want to re-define another, similar, method as a wrapper to pass an argument to the actual event handler.
+  // A better solution is to use an in-line function using the arrow function we would have used for the doHandleIncrement.
+  // Now, when rendering a list of products in our map method we have access to a product object, so instead of hard-coding the ID to pass for product
+  // we can pass a reference to the product we are currently rendering.
+  /*
+From the forums:
+The goal of this lesson is to show how to call a handler method and pass arguments to it using onClick event.
+Mosh wrote product as an example when user add a product to his shopping cart. And by passing this product object, you can update your state to identify what products the user have chosen. (Just like when you add a product in amazon or ebay).
+What you need to get from this lesson is when you want to pass arguments to your handler function, you have to call it inside arrow function. The type of these arguments depends in your project or the idea you are trying to implement.
+  */
+  
+    handleIncrement = product => {
+    console.log(product);
+    this.setState({ count: this.state.count + 1 });
+  };
+  
+    render() {
+    return (
+      <React.Fragment>
+        <span className={this.getBadgeClasses()}>{this.formatCount()}</span>
+        <button
+          onClick={() => this.handleIncrement( **PRODUCT** )} // ** Designates where the argument would be passed from, this code won't actually work as-written.
+          className="btn btn-secondary btn-sm"
+        >
+          Increment
+        </button>
+        {this.state.tags.length === 0 && "Please create a new tag!"}
+        {this.renderTags()}
+      </React.Fragment>
+    );
+  }
