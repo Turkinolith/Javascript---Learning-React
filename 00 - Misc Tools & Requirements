@@ -1,6 +1,8 @@
 Some needed tools:
 
-bootstrapper -  *see all bootstrap classes at https://www.w3schools.com/bootstrap/bootstrap_ref_all_classes.asp
+bootstrapper -  
+*see all bootstrap classes at https://www.w3schools.com/bootstrap4/bootstrap_ref_all_classes.asp
+*or https://hackerthemes.com/bootstrap-cheatsheet/
   install - npm i bootstrapper
   import - (in index.js) - import 'bootstrap/dist/css/bootstrap.css'
   
