@@ -1,0 +1,46 @@
+
+class Counter extends Component {
+  state = {
+    count: 0
+  };
+  
+    handleIncrement = () => {
+    this.setState({ count: this.state.count + 1 });
+  };
+  
+   render() {
+    return (
+      <React.Fragment>
+        <span className={this.getBadgeClasses()}>{this.formatCount()}</span>
+        <button
+          onClick={this.handleIncrement}
+          className="btn btn-secondary btn-sm"
+        >
+          Increment
+        </button>
+      </React.Fragment>
+    );
+  }
+  
+  formatCount() {
+    const { count } = this.state; // This is a destructuring assignment to reduce lengthy code like "this.state.count"
+    return count === 0 ? "Zero" : count;
+  }
+  
+Lets see what happens under the hood when we click the Increment button found on lines 15-20.
+
+We're calling this.setState found on line 8, this method is telling react that the state of this component is going to change.
+React then schedules a call to the render() method. We don't know when, this is an asynchronous call. So its going to happen in the future, 5ms or 10ms later, we're not sure.
+
+So, at some point the render() method is going to be called. 
+The method is going to return a new react element, the <div> we have on the top with 2 child elements: the <span> and the <button>
+
+So, our virtual DOM is a tree with 3 elements. A react element on the top (the div) that has 2 children.
+    [div]
+  [span][button]
+
+The new virtual DOM will compare to the old virtual DOM to figure out which elements are modified.
+It will see that the <span> has modified as that is where we have used the formatCount() property.
+It will reach out to the real browser DOM and update the corrisponding <span> so it matches the virtual DOM.
+To see this open console and inspect the span element, note that every time you click the increment button only the span tags will get modified.
+
