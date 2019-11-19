@@ -1,0 +1,27 @@
+Every React component has a property called 'props'.
+This is basicly a plain JS object that has all of the attributes that are set upon its component.
+You can see this by doing a console.log('props', this.props); in the render of the element.
+
+to set the count property of our Counter.jsx class to the value set in counters.jsx, use Count: this.props.value (value being the property name.)
+To be consistant with the name of the property we are setting from the outside, we will rename count to value.
+
+****** CHILDREN PROPS *******
+
+There is a special Prop called: Children
+This is used to pass data between the opening and closing tag of an element.
+Example:
+        {this.state.counters.map(counter => (
+          <Counter key={counter.id} value={counter.value}>
+            <h4>Counter #{counter.id}</h4>
+          </Counter>
+        ))}
+In this case, the <h4> section is the child of the <Counter> tag because it is inserted before the <counter> tag is closed.
+by inserting {this.props.children} into the render method of our Counter elements we can pass that data into them, generating titles for each counter.
+We can make these dynamic by using the #{counter.id} as above, we can pull the ID# for each one to have a unique title for each.
+
+In this example, I didn't really need to use a child element to get this title. I could instead simply pass the ID as another attribute.
+IE: <Counter key={counter.id} value={counter.value} id={counter.id}>
+and back in the Counter render method simply replace the {this.props.children} with <h4>Counter {this.props.id}</h4>, it would have the same result.
+
+The best time for using children is when passing complex elements to child components such as a dialogue box. Those are the times you'd want to use children props.
+		

@@ -1,6 +1,0 @@
-Every React component has a property called 'props'.
-This is basicly a plain JS object that has all of the attributes that are set upon its component.
-You can see this by doing a console.log('props', this.props); in the render of the element.
-
-to set the count property of our Counter.jsx class to the value set in counters.jsx, use Count: this.props.value (value being the property name.)
-To be consistant with the name of the property we are setting from the outside, we will rename count to value.
