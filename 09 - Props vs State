@@ -1,0 +1,15 @@
+Props vs State:
+
+Props includes data that we give to a component
+State includes data that is local or private to that component. Other compoents cannot access that state, it is completely internal to that component.
+
+Example:
+<Counter key={counter.id} value={counter.value} id={counter.id} />
+This is where we're using the counter component, all of these attributes that are being set here are part of the props. The input to the component.
+We cannot access the state of the component. The state is internal to the component.
+
+Similarly, the counters component has its own local state which is completely invisible to other components.
+Sometimes a component may not have a state, it'll get all the data it needs via props.
+
+Another difference between props vs state is Props are read-only, we can not change the input to the component inside of it.
+React will not allow you to change the properties of a props object. You need to get the input and put it in the state and modify it with setState.
