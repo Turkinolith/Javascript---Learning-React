@@ -1,0 +1,135 @@
+These are consolidated notes from my first React project. I broke these out because the instructor skipped out of this project to work on a 2nd one early on. 
+When I came back to the project I found the code was messy with all of the in-line comments so this is a collection of them all dumped out and noted by file they came from.
+
+
+****** INDEX.JS
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
+
+***** counter.jsx
+
+
+  // Conditional Rendering: We have an array of items and their being rendered in a list.
+  // Lets say we only want to display the list of objects if there are 1 or more elements, otherwise display a message that there are no tags.
+  // To conditionaly render elements we go back to plain JS.
+
+  // In addition to this, we can also add a react element that if it meets a simple condition can display text:
+  // {this.state.tags.length === 0 && "Please create a new tag!"} If that condtion is not met, it does not display.
+  // This is because in JS when comparing two "truthy" statements, the return is always the last statement checked, as long as its "truthy"
+  renderTags() {
+    if (this.state.tags.length === 0) return <p>There are no tags!</p>;
+
+    return (
+      <ul>
+        {this.state.tags.map(tag => (
+          <li key={tag}>{tag}</li>
+        ))}
+      </ul>
+    );
+  }
+
+  // Now that we have the proper value for "this" set, we can pudate the count property. in react you do not directly modify the values because REACT isn't aware that the values
+  // are being updated. To solve this use a method from react, this.setState(). This is because react has to be explicitly told what has changed in order for it to update the DOM.
+  // So for the setState method you pass an object, the properties of that object will be merged with what is in the state object, or overwrite the properties if they already exist.
+  // Currently the below function does not take any arguments. But sometimes you might need to do this.
+  // EX: lets say that our span is a list of products in a shopping cart. When we click increment we want to pass the ID of a product.
+  // Earlier we found that the onClick cannot call handleIncrement() and pass an argument like 1, it needs to pass a function reference
+  // Here is one solution: define a new method: doHandleIncrement, use arrow function, and call this.handleIncrement with an argument.
+  // Now add a parameter product to the handleIncrement function, finally, change the onClick to reference this.doHandleIncrement instead.
+  // This works, but it is messy. We don't want to re-define another, similar, method as a wrapper to pass an argument to the actual event handler.
+  // A better solution is to use an in-line function using the arrow function we would have used for the doHandleIncrement.
+  // Now, when rendering a list of products in our map method we have access to a product object, so instead of hard-coding the ID to pass for product
+  // we can pass a reference to the product we are currently rendering.
+  /*
+From the forums:
+The goal of this lesson is to show how to call a handler method and pass arguments to it using onClick event.
+Mosh wrote product as an example when user add a product to his shopping cart. And by passing this product object, you can update your state to identify what products the user have chosen. (Just like when you add a product in amazon or ebay).
+What you need to get from this lesson is when you want to pass arguments to your handler function, you have to call it inside arrow function. The type of these arguments depends in your project or the idea you are trying to implement.
+  */
+
+  handleIncrement = product => {
+    console.log(product);
+    this.setState({ count: this.state.count + 1 });
+  };
+
+  // The below is one way to bind event handlers, but the above arrow function also works. It is experimental so it may break in the future but it is far simpler to
+  // call the binding in this way than to make a constructor and bind each handle event.
+
+  /*   handleIncrement() {
+    console.log("Increment Clicked", this);
+  } */
+
+  /*   constructor() {
+    super(); // calls the constructor of the parent class inside this function, so we have access to the counter object.
+    this.handleIncrement = this.handleIncrement.bind(this); // The right hand side of this statement returns a new version of the handleIncrement() function with "this" rebound
+    // to the current object. Since this is returning a new function we get the value and pass it to this.handleIncrement
+  } */
+
+  // Note in the button element, we're not calling the function. We're just passing a reference to it.
+  // Also note the "onClick" peropty is case sensitive. Note with console.log that now each time the increment button is clickd, it logs it.
+  // Now we want to increment the value of the count property, but there is a problem with the implementation.  if I log this.state.count I'll get an error because 'this' is undefined in the function, it needs to be bound.
+
+  // Below, to arrange the tags out we use the .map function to order the items out and list them into a JSX expression. Since they need to be renderd dynamicly, we add
+  // curly braces into the <LI> tags and put the value in there. React doesn't like this as each child of the list needs a unique identifier so it can keep track of DOM
+  // changes, so to address this in the <li> tag we add the key attribute. Since this is from an array we can use the same value to identify them.
+  // In a realworld app, the values may be from objects, so we could use a property like "tag.id" to identify them instead.
+  // The uniqueness of the key need only be for this list, it doesn't have to be global unique.
+  render() {
+    return (
+      <React.Fragment>
+        <span className={this.getBadgeClasses()}>{this.formatCount()}</span>
+        <button
+          onClick={() => this.handleIncrement({ id: 1 })}
+          className="btn btn-secondary btn-sm"
+        >
+          Increment
+        </button>
+        {this.state.tags.length === 0 && "Please create a new tag!"}
+        {this.renderTags()}
+      </React.Fragment>
+    );
+  }
+  // Defining classes in the render method was polluting the function, so we can easily take it out by selecting the code block, right click and select "refactor"
+  // It auto generates a new method in the class that you just give the name to. We didn't need the variable for it so removed that and moved the method call into the className section.
+  getBadgeClasses() {
+    let classes = "badge m-2 badge-";
+    // To avoid repeating "badge-" in the append below, we can just put it here and it'll append the appropriate ending to it.
+    // Finally, just replace the hard-coded classes in the <span section below with the link to the variable classes.
+    classes += this.state.count === 0 ? "warning" : "primary";
+    return classes;
+  }
+
+  formatCount() {
+    const { count } = this.state; // This is a destructuring assignment to reduce lengthy code like "this.state.count"
+    return count === 0 ? "Zero" : count;
+  }
+}
+// the curly braces in span allows me to put in any valid JS expression to control the value.
+// This can be linking to a value elsewhere, or even calling a function that returns a value.
+// in this case, just tie it to the value of count within the state property.
+// After adding the formatCount function, this allows me to display the numeric value for > 0, and display the string 'zero' when === 0.
+// return count === 0 ? "Zero" : count; <-- This is perfectly fine, but to take it to the next level you can also return a
+// JSX expression to format the display. So we can instead turn it into this:
+// return count === 0 ? <h1>Zero</h1> : count;
+// Now it has H1 formatting.
+// This trick works with pretty much anything, even variables can have JSX values put into them.
+
+// Lets say you want to add a class to the span element.
+// Adding class tags is a bit different, you need to use the className JSX term because "class" is already a reserved term in JS.
+// I add the bootstrap classes "badge" and "badge-primary". (See all bootstrap classes at https://www.w3schools.com/bootstrap/bootstrap_ref_all_classes.asp)
+//it looks good but the button is right next to the text, so I can go in and add "m-2" for Margin 2 to give it a bit of room.
+
+// Styles:
+// for the most part its best to use classes for performance and maintainability. There are times you might want to break the rules.
+// if you know what you are doing and want to apply a style to a specific element.
+// in JSX there is the style attribute that you need to assign to a plain JS object.
+// one way to do this is to define a property on the class that has the object
+// that property object is CSS styles in camelCase notation. if you use a plain int it will be auto converted to "10px"
+
+// possibly you might want to define styles to different elements so you don't want to define them as multiple properties in the class.
+// We can define them as in-line styles by adding a second object inside the first one within the style call and set the properties on that object.
+// IE: <span style={{ fontSize: 30, fontStyle: "oblique"}} className="badge badge-primary m-2"> , doing this you don't need to define it on the class.
+
+export default Counter;
