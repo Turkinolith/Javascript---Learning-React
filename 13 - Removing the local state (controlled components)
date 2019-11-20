@@ -1,0 +1,5 @@
+**** REMOVING THE LOCAL STATE ****
+So in the counter component, we want to remove the local state and only rely upon the props to recieve the data that it needs. This is called a "controlled component"
+
+** CONTROLLED COMPONENT**
+** A component that doesn't have its own local state. it recieves all its data via props and raises events whenever data needs to be changed. Its entirelly controlled by its parent.
