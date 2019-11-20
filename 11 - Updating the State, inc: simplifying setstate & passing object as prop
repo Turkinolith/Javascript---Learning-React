@@ -1,0 +1,59 @@
+**** UPDATING STATE ****
+To update the state we need to add a counterID paramter to the handleDelete method, so we know which ID we need to delete from the counters list within the state.
+Lets log this to make sure we're passing the data correctly.
+First lets modify the clg to: console.log("event handled", counterID);
+
+now, lets go back to counter component and make sure to pass that information in the onClick event for the delete button.
+To do this, we use an arrow function and call onDelete with this.props.id.
+Counter.jsx- Added:
+	    <button
+          onClick={this.props.onDelete}
+          className="btn btn-danger btn-sm m-2"
+        >
+          Delete
+        </button>
+
+Clicking the delete buttons will return in console: Event Handled 1, Event Handled 2, and so on.
+
+** Assumption: like in my other project I assume what I'll do now is call setState, then filter the counters array minus the ID called by the delete button. Lets continue and see if I'm right.
+** Yep! totally right!
+Here is how the handleDelete is refactored:
+
+  handleDelete = counterID => {
+    const counters = this.state.counters.filter(c => c.id !== counterID);
+    this.setState({ counters: counters })
+  };
+  
+This can be simplified a bit, because the key and value of the new object are the same, we can just put the word in once by itself
+
+  handleDelete = counterID => {
+    const counters = this.state.counters.filter(c => c.id !== counterID);
+    this.setState({ counters })
+  };
+
+  
+**** Passing Object as prop instead of properties of the object ****
+Tiny issue in Counters.jsx:
+in the counter render we are passing several values:
+
+  <Counter
+	key={counter.id}
+	onDelete={this.handleDelete}
+	value={counter.value}
+	id={counter.id}
+  />
+
+Three of these are props we are passing to the child components, the onDelete Event, the value, and the ID. 
+One question you may have is why pass key and ID when their values are the same? It looks like repitition.
+its because key attribute is used internally by react and we can't use it within the component. So we can't access it, thats why we have to pass ID as a prop.
+The issue is that we pass "value" and "id" as seperate props. Both are properties of the counter object. If we add a new property we have to go back here and add a new prop onto this list. Over time this will get messy.
+
+** The point of objects are to encapsulate related values **
+
+So, instead of these 3 properties we can just pass the counter object itself. counter ={counter}
+This object already has everything we need to know about a counter and if we add new properties we don't have to go back and add them to the list of values.
+
+With this change we need to go back and modify the counter component. 
+the delete button onclick needs to be changed, since we no longer have the "id" property explicitly called out we just pass the counter object first, then get the id.
+onClick={() => this.props.onDelete(this.props.counter.id)}
+similarly we do the same where we were reading "value" in the state for counter: value: this.props.counter.value
