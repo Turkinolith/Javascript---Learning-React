@@ -1,0 +1,36 @@
+Next in the counters project lets add a button that deletes a counter from the list.
+Easy enough to add, add another button in the render method for counter.
+But, to delete it we need to remove the entry from the state of the "Counters" component.
+
+**** THE COMPONENT THAT OWNS A PIECE OF THE STATE, SHOULD BE THE ONE MODIFYING IT ****
+
+Since the array of counters exists inside of the Counters component, adding or removing from its state list should be done inside of that component.
+
+In the last lession it was noted that the state of a component is private, so how to modify the counters component from the counter component since this is where the delete button resides?
+To solve this, the counter component needs to be able to "Raise an Event"
+I will call this event "onDelete"
+The "Counter" component will raise the event, and the "Counters" component will "Handle" the event.
+in other words, the Counters component will have the handleDelete() function implemented there.   **((Just like sending events in WOW
+
+To implement this:
+We need to add a new method to Counters component.
+Then pass a reference to that method via props to Counter component.
+
+*** Summary of changes ***
+Counter.jsx- Added:
+	    <button
+          onClick={this.props.onDelete}
+          className="btn btn-danger btn-sm m-2"
+        >
+          Delete
+        </button>
+	
+Counters.jsx- Added:
+  handleDelete = () => {
+    console.log("Event Handled"); //TODO - Update the State
+  };
+ 
+* Within the <Counter prop keys, added the entry:
+onDelete={this.handleDelete}
+
+Next - ** Updating the State ** and implementing the handleDelete method.
