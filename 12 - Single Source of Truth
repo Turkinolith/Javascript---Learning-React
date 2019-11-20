@@ -1,0 +1,14 @@
+**** SINGLE SOURCE OF TRUTH ****
+In the current implementation of the counter program, there is *NOT* a single source of truth.
+
+Lets illustrate this with an example: lets add a button at the top that resets the value of all of the counters.
+
+on the Counters page we add a button that sets the value of the Counters object all to 0. Save and reload the page:
+when you click the reset button, nothing happens. If you inspect the counters class in the react dev tools you will see that all of the counters have their value set to 0, as expected. 
+But why did it not update?
+
+If you look at the individual counter ID#2, you will see in its props it has value 0, but its state is value 5. The issue here is there is not a single source of truth because we were using the value on "Counters" to estabilish the
+initial value for the counter object. After that initial value was set, the Counter object took control with their own local state. The value in "counters" is disconnected from the state of the "counter" objects.
+
+How to fix this?
+We need to remove the local state from the Counter object and have a single source of truth on the "Counters" object. (feels like event handling time)
