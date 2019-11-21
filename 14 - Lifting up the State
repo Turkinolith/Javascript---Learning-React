@@ -1,0 +1,35 @@
+After refactoring the Countes app here is a visual layout of the component structure:
+					[ App ]
+		[ NavBar ]			[ Counters ]
+							[ Counter ]
+							
+In this case, I'd like to have a counter total display upon the NavBar. In the case of counters to counter there was a parent-child relationship, but there isn't a similar one for the Navbar.
+In such a situation where there isn't that relationship but you want to keep them in sync and share data, you need to "Lift the state up"
+AKA: need to lift the state of the counters component to App, that way both NavBar and Counters have the same parent (App) and they can pass the state down to the children via props.
+
+**************************
+** LIFTING THE STATE UP **
+**************************
+Currently, the counters state resides in "Counters", as well as the methods that modify or mutate the state.
+To lift the state we move the state and all the methods that modify it to the parent component, "App".
+This is easily done with cutting the state and all the methods out and pasting them into App.js
+
+Back in counters.jsx there are events calling handleReset, etc. that will no longer work since the state has been moved to be from the parent. These need to be updated and the state needs to be passed down using props.
+
+back in app component in the render method, we need to modify this to raise events such as onReset, onDelete, etc.
+I add the onReset, onIncrement, onDelete events to the <Counters /> portion of the render method.
+back in the counters component, we change the Reset button onClick event to: {this.props.onReset} because that is the name of the property we set in the app component.
+similarly, onDelete gets changed to {this.props.onDelete} and onIncrement to {this.props.onIncrement}
+essentially, this component is recieving the onDelete from below and lifting it up yet again to the App component.
+Finally, since the state is no longer in counters, the line {this.state.counters.map(counter => ( will no longer work.
+It needs to be changed to {this.props.counters.map(counter => (, and back in the App component we should also pass the list of counters. counters={this.state.counters}
+
+
+So now in App.js, the counters component is a controlled component, it doesn't have state it just recieves data and methods to modify the data by props. 
+
+In App.js we are passing the counters to the Counters component, similarly we can pass that array to the NavBar component.
+We can pass either the counters array, or just pass the total number of counters so that the NavBar doesn't have to do the calculations. IE: <NavBar totalCounters={this.state.counters.length} />
+Or, could take this to the next level and filter only the counters with a value greater than zero. IE: <NavBar totalCounters={this.state.counters.filter(c => c.value > 0).length} />
+In the NavBar.jsx Right after the label is where we want to add the data: like a span, with classes badge, badge-pill badge-secondary, then for the display {this.props.totalCounters}
+
+Now I've lived the state from the Counters component to its Parent, the App component, and that state can be shared with the children of that component via props and with this technique there are now multiple components in sync.
