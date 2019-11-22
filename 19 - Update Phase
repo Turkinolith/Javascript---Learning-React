@@ -1,0 +1,29 @@
+******************
+** Update Phase **
+******************
+Happens whenever the state or props of a component change.
+I added a "## rendered" clg to the render method of the app, counter, and counters components. 
+Pressing the "increment" key on any given counter causes all of them to display in the console. So, on each update the render methods are being re-ran. Note that there are no updates to them.
+An example of how to use this is in the counter component:
+add a lifecycle hook: componentDidUpdate() {} - This hook is called after a component is updated, meaning it has new state or new props. So its state can be compared with the new state or new props compared to old props, then if there isa change we can
+do something like make an AJAX request to the server to get new data. if there are no changes, perhapse we don't want to make a new request. This is an optimization technique.
+How this hook would be used:
+  componentDidUpdate(prevProps, prevState) {
+    console.log("prevprops", prevProps);
+    console.log("prevState", prevState);
+    if (prevProps.counter.value !== this.props.counter.value) {
+      // Ajax call and get new data from server.
+    }
+  }
+  
+Output of clicking the first counter is:
+prevprops 
+{counter: {…}, onDelete: ƒ, onIncrement: ƒ}
+counter: {id: 1, value: 0}
+onDelete: counterID => {…}
+onIncrement: counter => {…}
+key: (...)
+get key: ƒ ()
+__proto__: Object
+
+So, you can see that when clicking Increment the previous state value was 0, now its 1, so you can compare the previous value to the new one and see if it matches, if its different do something.
