@@ -1,0 +1,19 @@
+**********************
+** Lifecycle Hooks  **
+**********************
+Components go through a few phases in their lifecycle
+There are a few special methods that can be added to components and react will auto call those methods. Their refered to as lifecycle hooks. They allow us to hook into certain moments in the lifecycle and do something.
+**Similar to on cast, on target, etc. script events in WOW.
+
+[Mount Phase] - When an instance of a component is created and inserted into the DOM.
+In the mount phase there are 3 hooks that are called in order. There are other types of hooks used in this and other phases, but their rarely used, the below are the most common.
+	- Constructor
+	- Render
+	- componentDidMount
+	
+[Update Phase] - Happens when state or props of a component change.
+	- Render
+	- ComponentDidUpdate
+	
+[Unmount] - When a component is removed from the DOM. (like deleting the counters)
+	-componentWillUnmount
