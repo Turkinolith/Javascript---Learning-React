@@ -1,0 +1,32 @@
+	
+********************
+** Mounting Phase **
+********************
+// **** Using Mounting Phase Hooks ****
+// ** NOTE: You can NOT use a lifecycle hook within a Stateless Functional Component, it must be a class component to use a lifecycle hook.
+// Looking at the Mounting Phase lets add a constructor function
+// This will be called only once, when an instance of a class is created. This is a great oppertunity for initializing the properties of that instance.
+// for example, a common use case is to set the state based upon the props recieved from the outside. this.state = this.props.something, note in this case you
+// do not use the setState method, that method is only used when a component is rendered and placed in the DOM, in this case that hasn't happened yet so we can
+// directly modify it in the constructor. Also note we don't have access to this.props unless props is passed as a paramter to the constructor and the super. else it will return undefined
+constructor(props) {
+    super(props); // To call the constructor of the parent class.
+    console.log("App Constructor", this.props);
+  }
+
+// Next, lets look at comonentDidMount:
+// this is called after the component is rendered into the DOM. This is the perfect place to make AJAX calls to get data from the server.
+  componentDidMount() {
+    console.log("app - mounted");
+	//Ajax Call
+	this.setState({ newdata })
+  }
+
+// The 3rd lifecycle hook in the Mounting Phase the Render method that I've already been using. I'll just add a console.log for that and look at the output:
+
+App Constructor > Object
+App Rendered (including all of its children that will be rendered)
+app - mounted
+<body>​…​</body>​
+Note the order, constructor first, then render, then mounted (when its in the DOM).
+Note on render: when a component is rendered, all its children are rendered recursively. 
