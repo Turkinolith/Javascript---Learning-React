@@ -1,0 +1,25 @@
+*************************************
+** Stateless Functional Components **
+*************************************
+The Navbar has only the Render Method, no render methods or helper methods and no state. All data is from props.
+In situations like this we can conver the component into a stateless functional component.
+Instead of using a class to define it, we use a function.
+IE: const NavBar = () => {};
+One change needed is: {this.props} wont work in a functional component. instead you need to pass props as a parameter and then remove "this"
+There is a shortcut for making these, just like cc for making classes.
+sfc = gives a template for defining the function.
+Resulting code:
+const NavBar = props => {
+  return (
+    <nav className="navbar navbar-light bg-light">
+      <a className="navbar-brand" href="#">
+        Navbar{" "}
+        <span className="badge badge-pill badge-secondary">
+          {props.totalCounters}
+        </span>
+      </a>
+    </nav>
+  );
+};
+
+export default NavBar;
