@@ -1,0 +1,11 @@
+******************************
+** Destructuring Arguments  **
+******************************
+In the above function we call props.totalCounters, but in a larger program we may be calling several props references. Instead of using dot notation everywhere for it we can clean this up with object destructuring.
+First remove the argument from the function, then add paren, then add curly braces for Object Destructuring, then add the name of the property in the object we want to pass.
+const NavBar = ({ totalCounters }) => {
+then remove the "props." part of our span.
+
+Similarly, in counters.jsx there are several "this.props" values that could also benefit from destructuring assignments.
+So, in the render method before the return, define a new constant that is set to an object, and pick the properties your interested in. use a comma to get multiple values.
+const { onReset, counters, onDelete, onIncrement } = this.props;
