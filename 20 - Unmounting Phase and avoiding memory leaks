@@ -1,0 +1,7 @@
+**********************
+** Unmounting Phase **
+**********************
+This has only one hook:
+componentWillUnmount() {} 
+it is called just before a component will be removed from the DOM. This happens just after the other components have been re-rendered by React and it is comparing the new virtual DOM to the old one and realizes it needs to remove a component.
+This gives an oppertunity for clean-up, like if you set timers or listeners you can clean those up before the component is removed from the DOM. Otherwise we will end up with memory leaks.
