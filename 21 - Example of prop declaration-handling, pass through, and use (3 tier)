@@ -1,0 +1,44 @@
+This is a brief example from one of my projects of a 3 tier file structure with the state owner establishing props,
+the middle component setting those props on itself and passing them down, and the props being called on its child component.
+
+State Owner:
+		App.js - in render()  **State is owned here, props are handled.
+		<Counters
+            counters={this.state.counters}
+            onReset={this.handleReset}
+            onIncrement={this.handleIncrement}
+            onDecrement={this.handleDecrement}
+            onDelete={this.handleDelete}
+
+Middle component:	
+		counters.jsx - in render() **Props are being passed through.
+		    const {
+			  onReset,
+			  counters,
+			  onDelete,
+			  onIncrement,
+			  onDecrement
+			} = this.props;
+			return (
+          <Counter
+            key={counter.id}
+            onDelete={onDelete}
+            onIncrement={onIncrement}
+            onDecrement={onDecrement}
+            counter={counter}
+          />);
+		  
+Child component:
+		counter.jsx - in render() **The props being passed up start here
+		  <button
+            onClick={() => this.props.onIncrement(this.props.counter)}
+            className="btn btn-secondary btn-md"
+          >
+            +
+          </button>
+
+          <button
+            onClick={() => this.props.onDecrement(this.props.Counter)}
+            className="btn btn-secondary btn-md m-1"
+            disabled={this.props.counter.value === 0 ? "disabled" : ""}
+          >
