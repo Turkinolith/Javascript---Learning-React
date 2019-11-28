@@ -1,0 +1,17 @@
+Exercise: Adding Pagination to Vidly
+#1 - Add a pagination component - Want this to be completely decoupled from "movies" app.
+#2 - Start with a Stateless Functional Component, because this likely wont have a state. : irc + sfc, pass props as an argument, return null for now.
+#3 - When I want to build a reusable component before implementing it I should think of the interface. what inputs will it recieve, what events will it raise?
+The best way to decide the interface of a component is to use it before implementing it.
+#4 - import it into the movies.jsx.
+#5 - In the render method, below the table of movies, there I will call the component. Consider what inputs need to be given to it. 
+instructor believes we need total number of items and page size. Based upon that, the component can calculate the total number of pages and render them.
+#6 - Set the inputs: itemsCount and pageSize. itemsCount would be this.state.movies.count, but earlier on I already made a destructuring assignement so I can just use "count"
+	For pageSize I will need to store that in the state, so I'll make a prop declaration: this.state.pageSize, then I go up to the state and add that in. I'll hard set that to 4.
+	These were the inputs of the component, but it should also raise an event whenever the user clicks on a new page. I'll call that: onPageChange, which will be a method.
+#7 - Add the handlePageChange method, it should obtain as an argument the new page number. For now I'll just console.log the page.
+
+TODO: Display Pages 
+TODO: Handle Page Changes
+TODO: Handle Pagination Data
+TODO: Check Data Types
