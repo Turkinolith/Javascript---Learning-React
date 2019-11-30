@@ -1,0 +1,23 @@
+Handling Page Changes
+I have built a "onPageChange" event, but I'm not raising it yet anywhere.
+#1 - on the anchor tag in Pagination.jsx, add the onClick passing the page arguement from the .map. onClick={() => props.onPageChange(page)}, clicking on the links now displays the page # clicked on the console.
+#2 - Back on the pagination component, earlier I used object destructuring to pull the itemsCount and pageSize values out of props so I could more easily access them. to make the code less messy I should do the same with onPageChange.
+	remove props. from line 16 and move it to the props object on top. IE: const { itemsCount, pageSize, onPageChange } = props;   AND <a className="page-link" onClick={() => onPageChange(page)}>
+
+#3 - As the pages changes, I'd like to have the current page highlighted. I'll need to apply an "active" class conditionaly on the list item. So, if page === currentpage. So I'll need to 
+	know the current page by extending the interface of the component.
+
+#4 - add "currentPage" to the props and go back to the movies.jsx and pass it as a prop there and add it to the state. 
+	Down in the render method on movies.jsx I can use object Destructuring to clean up the code a bit. 
+	
+#5 - On the event handler for PageChange, I need to make it so whenever the page is changed it updates the state.
+
+	**trick**, select a method name, (ctrl+p to open search bar) and use @ to find where its being used in the script.
+	there get rid of the console.log and change it to setState({ currentPage: page })
+	
+	**trick** To make sure this all works, go back to pagination and at the top console.log(currentPage), this is because when the state is updated that component and all children are re-rendered.
+	This allows me to check the state value since it is simply console.logging the prop value.
+	
+#6 - Now, to apply the active class to the current page dynamicly.
+	on the pagination page in the <li> classes, instead of hard coding in the page-item class, pass an expression: { page === currentPage ? 'page-item active' : 'page-item' }
+	Now, the current page highlights when selected.
