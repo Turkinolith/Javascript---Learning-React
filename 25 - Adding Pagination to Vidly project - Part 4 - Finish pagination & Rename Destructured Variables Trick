@@ -1,0 +1,25 @@
+Paginating Data
+in the render method of movies.jsx I currently am rendering this.state.movies, this is the original movie list. I don't want to change the list, so as I paginate or filter the list of movies I want
+to create a second list that will be used for the render there.
+
+#1 - Since I'd like to use the pagination algorithm in other locations I don't want to implement it within the movies.jsx module, and it would bloat the size of the render method there anyhow.
+So, under the source folder I'll add another folder called 'utils', there I will keep utility classes and functions.
+
+#2 - I'll create a new file in the folder called paginate.js in it I'll import lowdash and create an export function for paginate that takes the arguments (items, pageNumber, pageSize)
+	to paginate the datea, first I'll need to calculate the starting index of the items on the pageNumber. the formula for this is: startIndex = (pageNumber - 1) * pageSize;
+
+#3 - Now, I can use lodash to go to that start index and take all of the items for the current page using its slice method. _.slice(items, startIndex) the method will slice the array starting from startIndex.
+	Now that I have an array, I can go to that array and pick items for the current page. lodash has a method for that too, the _.take() method. you give it an array and the total number of items you want to take from the array.
+	In order to call these methods using a chain, first I need to convert the items array to a lodash wrapper. 
+	
+#4 - To do this, _(items), this will return a lodash object and using it can chain lodash methods. _(items).slice(startIndex).take(pageSize) 
+	Now, to return this to a regular array I use the .value() method. all together it looks like this: _(items).slice(startIndex).take(pageSize).value();
+	This is how you paginate data on the client side.
+
+#5 - Now, import this back in the movies.jsx, then call the paginate function to add calling the function as a const "movies" in the render method and pass (this.state.movies) as an arguement.
+	Or, could continue using destructuring and pass "movies" in the destructuring const. 
+	The second argument is the current page, and finally pageSize.
+	
+#6 - Instead of rendering {this.state.movies...} in the <tbody> below, instead render the movies that are local in the method by replacing them with the recently defined "movies" const.
+	*** NOTE *** This generates an error though, since movies was passed in destructuring as a variable I can't use movies. So I'll rename the variable for movies in the destructuring to "allMovies"
+	**** RENAMING VARIABLE ON Destructuring TRICK ****
