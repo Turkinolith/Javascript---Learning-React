@@ -1,0 +1,20 @@
+Displaying Pages
+To do this, I'll be using bootstrap.
+#1 - Following Bootstrap documentation, add <nav>, <ul className="pagination">, <li className="page-item">, and <a className="page-link"> to the pagination.jsx.
+#2 - need to have an array of page numbers rendered, use the map method to map each number to a list item. [1, 2, 3].map()
+	To do this we need to use props, I passed down: itemsCount and pageSize. on Pagination before the return: const { itemsCount, pageSize } = props
+#3 - next define a variable for pagesCount: pagesCount = itemsCount / pageSize;
+	next, will need to return an array that will consist of 1  to the value of pagesCount so we can map it. [1 ...pagesCount].map()
+	How to do this? There are many ways, one simple way is to use "lodash" a popular JS library with a bunch of utility functions. I'm installing version 4.17.10
+	to install, npm i lodash, import _ from 'lodash'; (note: could have named the import whatever, but underscore is a common convention. lodash is an optimized version of a popular library called underscore.
+#4 - I use the .range method from lodash to generate an array starting from 1 up to the computed pagesCount (this was where I got stuck trying to come up with a good bespoke solution on my own earlier)
+	the function is using pagesCount for the end target, but it doesn't include the final number so I add +1 to the value to make sure the final page is rendered.
+#5 - Now that I have the array saved as [pages] I run that through a .map to generate the list item blocks and use the variable (page) in the map function both as the li key and as the displayed number.
+#6 - Edge case: if I end up in a situation where only one page is able to be rendered (IE: 10 is the value of pageSize and less than 10 in the database) it'll correctly display 1 as the pages.
+	But, it would be better to just not display anything if only one page is to be displayed. To do this back on the pagination page I add: "if (pagesCount === 1) return null;"
+	This doesn't work though! if I console.log the number I get the result of pagesCount to be 0.9, so if the result is a floating point number I need to convert it to an int. I'll use Math.ceil again to do this in the pagesCount declaration.
+	*This solution is very similar to what I was doing in my first pass of this problem, but I ended up hiding if === 0 and flooring the number.
+
+TODO: Handle Page Changes
+TODO: Handle Pagination Data
+TODO: Check Data Types
