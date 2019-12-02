@@ -1,0 +1,8 @@
+	**Simplifying interface by creating defaultProps
+#6 - Adding the 2 properties (textProperty and valueProperty) work, but it makes the interface of the ListGroup component complex. The fewer props we have to pass, the easier it is to use.
+	In this case I can assume most of the objects have those two properties (_id and name) so I can set the default value for the props and if in the future I'm working with a different kind of object
+	that doesn't have those properties I can override the default values.
+	Back in the listGroup.jsx i'll set default props for the component. 
+	After the ListGroup const is defined, I'll add a new entry for defaultprops and set it to an object.
+		IE: ListGroup.defaultProps = {  textProperty: 'name', valueProperty: '_id'};
+	With this done, I can remove the props assignment for these from movies.jsx as I no longer have to pass those props. This simplifies the interface of the list group.
