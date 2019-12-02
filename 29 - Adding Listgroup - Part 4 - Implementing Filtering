@@ -1,0 +1,14 @@
+	** Implementing Filtering
+#8 - In movies.jsx, in the line that defines 'movies' *line 50 in mine* I'm calling the paginate method to paginate all the movies. I need to apply the genre filter before pagination as the 
+	number of pages will vary by filtered movies.
+	First, I need to get the selected genre. On line 46 where I use object destructuring, add selectedGenre.
+	Now, before pagination, do filtering.
+	To do this use the tirnary operator: filtered = selectedGenre, if this is a "truthy" statement allMovies.filter(m => m.genre._id === selectedGenre._id) otherwise allMovies;
+		IE: If a genre is selected, filter allMovies for the genre, else return allMovies.
+		IE: const filtered = selectedGenre ? allMovies.filter(m => m.genre._id === selectedGenre._id) : allMovies;
+	Next, set the paginate function to pass "filtered" instead of "allMovies"
+	Next, go down to where <Pagination> is called and change the itemsCount to instead of pointing towards the total movies count to point towards filtered.length.
+	A quick test shows that I missed the "X movies in database" in the span, so lets update that. 
+	Testing again with varying page sizes shows that filtering and pagination how correctly update.
+  
+  ToDO: Implement "All Genres" filter option.
