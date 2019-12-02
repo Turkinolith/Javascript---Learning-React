@@ -1,0 +1,7 @@
+#7 - To capture the selected genre in Movies.jsx, replace the console.log in handleGenreSelect with this.setState({ currentGenre: genre }), add to the <ListGroup call and pass "selectedItem" as a prop.
+	I needed to refactor my "onItemSelect" function in listGroup.jsx to make this work compared to the instructor version: I was passing object.name as argument for onItemSelect but was comparing to the raw object value.
+		To make this work I needed to either compare against object.name or change the passed value of onItemSelect to be just 'object', either would work.
+    
+*Instructor note:
+Note the names of the props: onItemSelect, selectedItem 
+it wasn't called "currentItem" it was the same word and same language as the other prop. Don't use messy names for your props so you can easily find things.
