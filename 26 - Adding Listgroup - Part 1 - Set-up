@@ -1,0 +1,38 @@
+To add list group:
+
+Needs to either reside outside of the main component or within it but floated to the left.
+
+** State Updates: **
+Needs to replace the value of state{movies: getMovies()}
+
+Can be generisized like Pagination into its own component. Will need props passed to it for "genre", will need an "all" option for "all genres"
+Will need a state value added for genre displayed.
+
+*** Instructor Solution: ***
+#1 - Add a new component called listGroup *I was right!
+#2 - To format the display, change the <React.Fragment> of code into a div, then use a bootstrap row with two collums to organize the display. (Larry Note: This just changes the output to be formatted with a <div> inside of <main> in App.js, its still valid.)
+	Rename the fragment to Div, add class "row"
+	Create 2 more divs, one has class col-2 for the left side, other just has col, that'll take the rest of the space and be the main table area.
+	Next, move everything currently in the space within the right side col.
+	In the left col, add the new list group. (pass the ListGroup class from the component, but just adding the bootstrap demo text gives a quick verification of presentation.)
+	The ListGroup should get at minimum a list of items to render, so lets add an items property to the markup. I'll point it to this.state.genres, which currently doesn't exist so...
+#3 - Add to the state a "genres" entry and initialize it similar to movies. **NOTE: this is fine for a simple app like this, in a real app this is where I'd call back-end services.
+		The right place to init this is in componentDidMount lifecycle hook. So I added a setstate update off the DidMount hook (aka when its rendered into the DOM) and added getMovies and getGenres to have their state updated and replaced their set values in state with an empty array.
+			*Why empty array? Because it may take some time for the data requested to be recieved from the server, these need to be set to a valid data type so they don't return as 'undefined' and generate a run-time error.
+			
+*NOTE: I went out on my own here and finished writing up the side bar and listing out generes.
+
+#4 - back to the render component for ListGroup, can't think of any more inputs, so what events do we need? Whenever the user selects an item we need an event so we can filter the list of movies.
+	Add event onItemSelect set to a method {this.handleGenereSelect}
+#5 - The instructor went into rendering the side bar, his implementation was very similar to what I did. *I was right!
+	**Making the listGroup decoupled from the format of fakeMovieService.js value names**
+	I'm assuming each item in my items array to have the properties _id and name, what if the source object was formatted in a different way (IE: value instead of _id). 
+	So, to have the list group to be more flexable we need to pass 2 more props. they will determine the name of the target properties: '_id' and 'name'.
+	So, back in the movies.jsx in the <ListGroup> add a couple more props: textProperty="name", valueProperty="_id". So when using ListGroup apart from passing the list of items we now also pass the name of text and value properties.
+	Back in listGroup.jsx I need to pick out those properties from the props object. 
+	This way instead of using dot notation to access the property I can use bracket notation to access the values dynamicly. IE: key={object[valueProperty]} & {object[textProperty]}
+	Now I can use this listGroup with any list format by just reassigning the valueProperty and textProperty props values in the calling component.
+  
+  TODO:
+    Add Filtering
+    Implement "All Genres" option.
