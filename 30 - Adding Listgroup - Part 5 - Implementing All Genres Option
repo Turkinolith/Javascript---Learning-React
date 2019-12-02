@@ -1,0 +1,23 @@
+	**Adding additional filter "All Genres"
+#9 - in movies.jsx, in the componentDidMount() method I'm initializing the genres property of the state object. It needs some modification before moving forward:
+	create a new constant genres that is set to a new array, spread value the getGenres() and put a new object at the beginning of the array, assigning the name property to 'All Genres', an ID isn't set
+	since this isn't a valid ID in the database. Its just an item for the top of the genre list. 
+		IE: const genres = [{ name: "All Genres" }, ...getGenres()];
+	Now, pass that new genres constant as the value of the genres state property. this.setState({ movies: getMovies(), genres: genres });  because the genres value matches the key name, can simplify this
+	by just using the word: genres.
+		IE: this.setState({ movies: getMovies(), genres });
+	**ALERT** When you test this, it works untill you select "all genres" and it shows 0 movies in the database.
+	Why? in the render method where I filter the movies list I'm checking to see if the selected genre is "truthy" if so I filter the movies. So, I get each movie and compare if the movies genre ID matche sthe selected genre ID.
+	HOWEVER, because I did not create a key when I created the genres constant above, I only set the name, there is nothing for it to compare to, so everything fails and 0 is displayed.
+	To fix this I need to change the condition to something like this:
+	const filtered = selectedGenre && selectedGenre._id, So if both selectedGenre AND selectedGenre._id are both "truthy" it will apply the filtering, else display "allMovies" like we want.
+	**ALERT NOTE** While this works, Chrome sends an error about how each child in a list should have a key.
+		To resolve this I added a hardcoded key to "All Genres" of "9999" and set the filter so that as long as the genreID is anything other than 9999, it'll evaluate true and use the filter option.
+			    const filtered =
+					selectedGenre && selectedGenre._id !== "9999"
+					? allMovies.filter(m => m.genre._id === selectedGenre._id)
+					: allMovies;
+	
+	There is a bug in this implementation: if you select "All Genres" set the selectedPage to 2, then select any other catagory it will display nothing while the log shows 3 movies in the database.
+	The reason for this is we're looking at the 2nd page of that genre, even though there is only one page for those. To fix this whenever the filter is changed we should also set the page to 1.
+	So, back in the "handleGenreSelect" when I set the state, I should also set the currentPage: 1.
