@@ -1,0 +1,79 @@
+
+Sorting - Raising the Sort Event
+
+
+#1 - 
+	Now, I need to enable onClick on each of the table headings and raising a sort event.
+	In the destructing for props, I add a new prop: onSort.
+	on each of the <th elements I add onClick={() => onSort()} (this can be quickly done with ctrl+d to select multiples and write them all at the same time.)
+	add the string to pass on for each, they can be found in the <td> map data below. title, in the case of genre it needs to pass 'genre.name' since it is a nested property, numberInStock, and dailyRentalRate
+	
+#2 -
+	Back in movies.jsx I need to pass the handle event for sorting the table. 
+		onSort={this.handleSort}
+	
+#3 -
+	Now, implement a stub of the sort handler and verify that the data passes as I'd expect:
+	handleSort = path => {
+    console.log(path);
+	};
+	
+	**Note: in testing this, the instructor saw the warning about the listgroup that I fixed in the previous exercise. Lets see how he handles it:
+		He fixed it by simply passing an empty string as the key. This actually is more efficient than my fix since JS reads an empty string as a "falsy" value. I'll quickly convert my code to match.
+
+
+Sorting - Implementing
+
+#1 - Use the same approach as used earlier in the component. In all the event handlers when I change the page or select a genre I update the state, which causes a re-rendering, and in the render method I figure out what I need to display.
+	I change the handleSort method to be:
+		this.setState({ sortColumn: { path: path, order: 'asc'} }), which can be simplified a bit: this.setState({ sortColumn: { path, order: 'asc'} })
+	Next I'll implement the ascending sort and come back and do the reverse order.
+	I should first set the sortColumn in the state so that when the page loads I know how its sorting.
+		sortColumn: { path: 'title', order: 'asc'}
+
+#2 - To implement the sorting, I'm going to once again use lodash.
+	Import the library:
+		import _ from 'lodash';
+		
+	Go down to render method, I should do sorting after the data is filtered but before pagination, so I'll insert the code there.
+	using the orderBy method from lodash: _.orderBy()
+	The first argument of .orderBy is the input, so I put in filtered, the second argument is an array of property names because I can sort by multiple properties. Here I only have one column so I put in sortColum.path. I need to get it from the state so
+	I add sortColum into the destructuring.
+	Finally the 3rd argument is the sort order. its again an array so I'll simply pass sortColumn.order. 
+	final code is: _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+	this returns an array, so I save it as "sorted" and pass that into the paginate function in replacement of "filtered"
+	
+	Save and test, works beautifully.
+	Now, implementing the reverse sort:
+	
+#3 - In the handlesort I need to make a change:
+		If the path argument I get into the function is the same as I have in the sortColumn, I should simply reverse the sort order. otherwise update the path and set to 'asc'. There are various ways to do this, so here is one way:
+		First clone the existing sort column object: const sortColumn = {...this.state.sortColumn};
+		Then, check if the cloned state matches the passed in value: if (sortColumn.path === path)
+		next, set the order while first checking if it is ascending, if so set to descending. else, ascending. sortColumn.order = (sortColumn.order === 'asc') ? 'desc': 'asc';
+		Otherwise, if the path is different, sortColumn.path = path; and sortColumn.order = 'asc';
+		finally update the state based upon the new sortColumn object. this.setState({ sortColumn });
+		Again, this is set up to format for the lodash (orderBy) method.
+
+#4 - There is a problem with this implementation. If I reuse the MoviesTable component somewhere else, like on another page, there when the table raises an event I need to duplicate the logic for determining the sort order.
+	Technically that logic belongs to the moviesTable component itself. So when it raises the sort Event, instead of giving a path that is a string it should give a sortColumn object so we know whats the path and the current sort order.
+	So, back in the moviesTable I should promote the MoviesTable from a function to a class because I want to add a method to it for determining the sort order.
+	
+	A - Created a new class named same as the old. Imported { Component } from React, got rid of the new class render return and export lines. 
+		cut all of the render data out of the old function and pasted it into the new one. then deleted the old function lines.
+		Replace props with this.props because props is not a parameter here.
+		Test it out, verify everything still works.
+		
+	B - Add a new method to MoviesTable: raiseSort, that takes a path argument. This function will hold the logic that determines the sort order.
+		Back in movies.jsx, all of the code within handleSort except for the last line for setting the state lets cut it out and paste it into the new raiseSort method in moviesTable.
+		Now, first line of that code I copy state.sortColum, I don't have state in this class so it needs to be refactored to ...this.props.sortColumn
+		Also, in the last line, I need to raise the sort event. this.props.onSort(sortColumn); so it passes the sortColumn object.
+	
+	C - Instead of calling the onSort function in the onClicks, now I'll call the new method I added to the class.
+		I select all occurrences of onSort and change them to: this.raiseSort
+		
+	D - Back in movies.jsx, the handleSort method no longer takes a path argument, it takes a sortColumn object. So I'll rename the argument.
+	
+	E - Finally, as I'm expecting to get the sortColumn passed to moviesTable via props, I need to enable that in the render method of movies.jsx.
+		sortColumn={sortColumn}
+
