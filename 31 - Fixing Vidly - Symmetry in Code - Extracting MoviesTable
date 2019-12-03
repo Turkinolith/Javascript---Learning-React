@@ -1,0 +1,26 @@
+There is an issue with the current implementation of Vidly: Mixed levels of abstraction in the render method return.
+	Some components are high level, or simplified, or abstract like the ListGroup and Pagination,  others are low level and very detailed like the table build-out. 
+	So, I don't have symmetry or consistency in the code. 
+	
+#1 - First thing to do now is extract a new component and move all the details about rendering the table into that component.
+	Create a new component (not in the common folder, this is not re-usable right now, its specific to this app) I'll name moviesTable
+	imr and sfc, call the component MoviesTable with pascal notation.
+	put all of the table section of the mark-up into it.
+	Next, need to fix props:
+	
+#2 - 
+	For clarity, lets do destructing to reveal props at the top of the function.
+		const { movies } = props;
+	Also need to fix the handlers for onClicks. Since the handling is still being done back in movies.jsx these should instead just pass up an event for movies.jsx to deal with.
+	I'll add a few more props to enable this pass.
+		const { movies, onDelete, onLike } = props;
+	Then I'll replace the handle calls.
+		onClick={() => this.handleLike(movie)} => onClick={() => onLike(movie)} and similarly onClick={() => onDelete(movie)}
+
+#3 -
+	Need to move the like import to moviesTable since it is a dependancy and isn't being used in movies.jsx anymore.
+	likewise need to import moviestable in movies.
+	
+#4 -
+	Need to initialize the MoviesTable component. set movies={movies} onLike={this.handleLike} onDelete={this.handleDelete}
+	Note: at this point now everything is showing the same layer of abstraction. Theres no mix of high and low level.
