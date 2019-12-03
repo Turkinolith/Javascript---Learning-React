@@ -21,3 +21,8 @@
 	There is a bug in this implementation: if you select "All Genres" set the selectedPage to 2, then select any other catagory it will display nothing while the log shows 3 movies in the database.
 	The reason for this is we're looking at the 2nd page of that genre, even though there is only one page for those. To fix this whenever the filter is changed we should also set the page to 1.
 	So, back in the "handleGenreSelect" when I set the state, I should also set the currentPage: 1.
+
+
+// UPDATE:
+the instructor saw the warning about the listgroup that I fixed in the previous exercise. Lets see how he handles it:
+He fixed it by simply passing an empty string as the key. This actually is more efficient than my fix since JS reads an empty string as a "falsy" value. I'll quickly convert my code to match.
