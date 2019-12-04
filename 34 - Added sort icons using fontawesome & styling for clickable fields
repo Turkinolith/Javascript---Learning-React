@@ -1,0 +1,26 @@
+Adding the sort Icon
+
+tableHeader.jsx:
+	after the column.label section of the <th> lets call a function {this.renderSortIcon()}
+	
+	above the render method lets implement the function.
+
+	renderSortIcon it will be a function that takes the current column that is rendering. Next we need to see if the rendered column is different from the sort column. If it is we dont want to render icons, so return null.
+	Otherwise, its sorted so I need to render different icons depending on the sort order. 
+		(this.props.sortColumn.order === 'asc') To get the icon I want I'll use fontawesome. the up arrow in fontawesome is an <i> tag and has the classes "fa fa-sort-asc" So, I'll return that react fragment to get the icon I want.
+		
+	Since I've repeated this.props.sortColumn twice, lets use object destructuring to clean the code. in the function I add:
+		const { sortColumn } = this.props;
+	now I change this.props.sortColumn to sortColumn.
+	
+	Finally, if none of the above are true, that means the column is sorted in descending order. So, just return the react fragment for the down arrow in fontawesome
+	Testing this has revealed an error that column was undefined, lools like I forgot to pass column as an argument in line 32 where I called the renderSortIcon function.
+	
+	Tested and its working fine now.
+	
+	Finally, just need to make the table header look like their clickable.
+	So I can either apply an inline style or apply a class I can re-use in multiple places.
+	I'll go to index.css, there I'll define a reusable class 
+	.clickable { cursor: pointer; }
+	Then, I'll go back into the tableHeader.jsx and apply that class to the <th className="clickable"
+	Similarly, I can now go apply this to the genres list and pagination entries.
