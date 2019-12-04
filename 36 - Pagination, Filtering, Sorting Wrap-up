@@ -1,0 +1,9 @@
+In the previous exercises I covered:
+
+Component Design principles
+Component Interface in terms of data it should recieve and that events it should raise
+Built Reusable Components
+Learned Refactoring Techniques
+and learned techniques of writing clean code.
+
+Next: adding Routing, adding multiple pages, and taking the user from one page to another.
