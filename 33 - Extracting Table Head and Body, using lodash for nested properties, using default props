@@ -1,0 +1,160 @@
+So after extracting the movies table I can use it in multiple places without duplicating the logic.
+However, for example, what if I have a table of customer data?
+With the current implementation I'd have to duplicate the logic in a component like "customersTable"
+So, I need to take it to the next level and extract a component like "tableHeader" that encapsulates the logic and I can re-use that component whenever I have a table
+regardless of the type of columns I have.
+
+#1 - 
+	In common folder add a new file: tableHeader
+	imrc & cc, TableHeader, remove state
+	back in moviesTable, I need to remove the raiseSort method into the new component.
+	in the render method I should have something like the <thead> section I have in the MoviesTable component. a <thead>, <tr>, and a bunch of <th></th>
+	In order to render the markup the table header needs to know about the columns.
+		So, columns should be passed as an array. 
+		Also in the copied code I have 2 references to this.props, so I should also pass "sortColumn" which is an object and "onSort" which is a function.
+		So the interface should look like:
+			columns: array
+			sortColumn: object
+			onSort: function
+	
+	Now, lets focus on the render method. return should have a thead, a tr, and a bunch of th elements. the TH should be rendered dynamically so we should pass a map function for that.
+		get this.props.columns.map get each column and map it to a <th> element. We need to render the name of the column, so each column should have a property like 'label'
+		{this.props.columns.map(column => <th>{ column.label } </th>)}
+	On the movies table, should also handle the onClick Event so I copy the expression and paste it into the expression.
+		{this.props.columns.map(column => ( <th onClick={() => this.raiseSort("title")}>{column.label} </th> ))}
+		
+	The render method now looks like this:
+	  render() {
+    return (
+      <thead>
+        <tr>
+          {this.props.columns.map(column => (
+            <th onClick={() => this.raiseSort("title")}>{column.label} </th>
+          ))}
+        </tr>
+      </thead>
+    );
+  }
+	Overview of whats going on: there is a thead, tr, bunch of th elements, each th has an on-click that calls the raiseSort method passing "title", each column has the label property displayed.
+	Instead of passing "title" I should refactor that to pass the path to the target property. ie: column.path from movies.jsx state.
+	This also needs a key added to it, so I pass column.path because it uniquely identifies each column.
+	<th key={column.path} onClick={() => this.raiseSort(column.path)}>{column.label} </th>
+	
+	Back in moviesTable.jsx I import TableHeader, then inside the class I add a new property columns, Note: its initializing there, it doesn't need to be part of the state. 
+	because its not going to change through the lifecycle of the component.
+	I add 6 columns, one for each in my worksheet, I define their values in 2 properties { path: '', label '' },
+	1st set is: 'title' and 'Title', 2nd 'genre.name' and 'Genre', 3rd 'numberInStock' and 'Stock', 4th 'dailyRentalRate' and 'Rate', for 5th and 6th their for my buttons, I don't need
+	a label as nothing is displayed and I don't sort them so I don't need a path either, so I just pass empty objects so they render.
+	This bugs the keys above as they don't have a unique property to use for a key, so instead I add "key: 'like' and key: 'delete'
+	next change the TH to choose one or the other:
+	<th key={column.path || column.key} onClick={() => this.raiseSort(column.path)}>
+	
+	Next, I replace the <thead> and contents in the render component with the new <TableHeader> component.
+	Next I need to pass columns, what else do I need to pass? I need to also get sortColumn and onSort, I already have both of those in the moviesTable since their coming from the 
+	parent which is the Movies component.
+	so I pass sortColumn={}, it should be picked from props so that needs to be added, same for onSort.
+	
+	
+**** Extracting TableBody
+
+So now in the moviesTable component, in the render(), I have the same problem I had earlier. I have mixed layers of abstraction going on.
+I have the <table /> component that inside has some high level of detail but right below that I have the <tbody> that has all the details about rendering the 
+body of that table.
+So I have mixed levels of abstraction, its very ugly. 
+Wouldn't it be better if like the <table> element I had a <TableBody /> ?
+So, lets go ahead and do it.
+
+#1 - create a new file in common folder: tableBody.jsx, import react component, make a class, no state, the usual.
+	Now, what to put in the render method? Lets look at the moviesTable render. we want a <tbody>, a <tr>, and some <td's>.
+	I'll want to render the <tr's> dynamically based on the number of objects I'd want to display in the table. Also what data do I want to pass here?
+	Well it looks like I'll need the list of movies, so lets set it up to pass the data: in moviesTable: <TableBody columns={this.columns} data={movies} />, notice the field is called "data" and not movies, we want this to be completely decoupled.
+	
+#2 - back in tableBody I do my object destructuring:
+		const { data } = this.props;
+	Down in the return I add an expression: {data.map(item => <tr> <td></td> </tr>)}
+	Similarly, I'll want the <td> tags to be dynamically rendered based on the number of columns, so this table body should also know about the columns. So I'll add columns to props and add an expression to map each column to a <td>
+		{columns.map(column => <td></td>}
+		
+
+	*** Rendering Cell Content ***
+	
+#3 - Rendering the content of each <td>
+		in the first <td>'s I was rendering the property of a movie object, but in the last 2 columns I was rendering custom content in the form of like and delete buttons.
+		That is the tricky part, so for now I'll focus on the first 4 columns.
+		Back in tableBody in the TD I want to render the property of the current item. To access the property dynamically, I use bracket notation.  {item[column.path]}, however this only works for simple properties.
+		if I'm dealing with nested properties, this does not work. IE: 'genre.name'  To get around this, I'll use lodash. 
+		import lodash in tableBody
+		lodash has a method called 'get'
+		<td>{ _.get(item, column.path)} </td> - You pass the object 'item' then the target property that can be nested, column.path.
+		
+#4 - Now lets look at the columns for the 2 buttons.
+		In the column there is a <Like> component. As covered before, these JSX expressions get compiled to React elements which are plain JS objects. 
+		as an example I can go to the top and declare a constant x = <h1></h1>;, this is a react element which is a plain JS object. the same is true with the <Like> component. So, just like I can pass an object to a function or use an object
+		as a value of a property, in the columns array I can add a new property with it. IE:
+			{ key: 'like', content: <Like /> }, 
+		So, I'll grab the reference to the <Like> component and put it in the columns array as the value of the content property.
+			{ key: "like", content: <Like liked={movie.liked} onClick={() => onLike(movie)} />},
+			
+		I'll use the same approach with the delete column.
+		    { key: "delete", content: <button onClick={() => onDelete(movie)} className="btn btn-danger btn-sm">Delete</button> }
+
+		Now, I can get rid of the <tbody> element!
+		However, there are errors: movie, onLike, onDelete is not defined.
+		in my <Like> element: content: <Like liked={movie.liked} onClick={() => onLike(movie)} />
+		its referring to 'movie' but we don't know which movie. how to fix this?
+		can replace the value with a function. So, instead of setting content: to a react element, I can set it to a function that takes a parameter like 'movie' and returns a React Element.
+			{key: "like", content: movie => <Like liked={movie.liked} onClick={() => onLike(movie)} />},
+			
+		There is a similar issue with the "onLike" part. onLike is part of the props object. So the MoviesTable is used in the movies.jsx component. It will raise the 'onLike' event there. So, onLike should be: this.props.onLike(movie)
+		
+		Now I need to make the same change to the last column.
+		Instead of setting the content value to a react element, I set it to a function that takes a movie object and returns a react element. Then I need to prefix the 'onDelete' with this.props
+		Back in the browser I still get a warning about having a unique "key" but I still dont have the buttons showing.
+		This is because in the TableBody for now I'm just rendering a property of a movie object, so I need to change this such that if the column has a content property that I render that content.
+			So in the <td> of tableBody.jsx I need to have a conditional statement, however I'd rather extract that logic into a separate method in order to clean up the code.
+		
+		in tableBody I'll add a new method: renderCell that takes 2 parameters. the current item, and the column.
+		there I'll check if column.content exists, if its defined, aka it'll be truthy, then I'll call it since its a function and I'll give it an argument of item, its the movie I'm rendering, and it'll return a react element.
+			    renderCell = (item, column) => {if (column.content) return column.content(item)};
+		
+		Recap: in moviesTable.jsx:
+				content: movie => (<Like liked={movie.liked} onClick={() => this.props.onLike(movie)} />)
+				This is a function that takes a movie or an item that returns a react element. So, whatever this function is returning...
+					renderCell = (item, column) => {if (column.content) return column.content(item)};   
+				Will simply be returned here.
+				Otherwise, if we don't have the column.content property we're going to render the property of the current items.
+					_.get(item, column.path)
+			Final renderCell method:
+				    renderCell = (item, column) => {
+						if (column.content) return column.content(item);
+						return _.get(item, column.path);
+					};
+		lastly, I'll put the renderCell call into the <td>, passing the item and column:  <td>{this.renderCell(item, column)}</td>
+		
+#5 - Fixing the issues with Unique Keys
+	in the TableBody render method I'm using .map in a few places:
+		I'm using it for the table rows, so each row will need a unique key. Thats pretty simple. I set a key value and I can assume most if not all objects we will render will have an id property.
+		I can do this by {item._id} but I could make this more flexable and pass an additional prop that determines the name of the target ID property. 
+		As I did in listGroup: I added a 'valueProperty' to this.props, added a defaultProps at the bottom before the export defining the valueProperty as "_id", then set key={item[valueProperty]}
+		
+		
+		I should also apply a unique key to the <TD>. Here I can combine the ID of the item I'm rendering with the path to the target property. 
+			IE: item._id + column.path
+			However, this will only work for the first 4 columns. For the last 2 where I have the <Like> and <Delete> buttons I don't have a path property. So, I can use a logical "OR" operator and use column.key.
+				code: {item._id + (column.path || column.key)}
+			The instructor would prefer to extract that code and put it in a new method as the <tr> is starting to get ugly. He defines it as createKey
+				IE: createKey = (item, column) => { return item._id + (column.path || column.key);}
+	
+	Now the code for the return reads as:
+	  <tbody>
+		{data.map(item => (
+          <tr key={item[valueProperty]}>
+            {columns.map(column => (
+              <td key={this.createKey(item, column)}>
+                {this.renderCell(item, column)}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+		
