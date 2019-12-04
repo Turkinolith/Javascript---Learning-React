@@ -1,0 +1,44 @@
+Sorting - Extracting Table
+
+One last refactoring in the moviesTable.component
+	in the render component I'm returning a <table>, <TableHeader>, and <TableBody>
+	With this implementation, the next time I want to render a table I have to add the Table again, plus the table header. NOTE: I'm also setting the "columns" attribute *Twice* (once in Header and once in Body)
+	Its a bit inconvenient to add a new table.
+	So, I'll extract a new component and call it Table so I can re-use it easily when I want to render a table of items. 
+	
+#1 - 
+	Create a new jsx named table, import react, create a SFC as this won't have a state. Pass props as a property to the SFC.
+	copy the <table> and all children from "moviesTable.jsx", also import TableBody and TableHeader.
+	define props in the SFC: need { columns, onSort, sortColumn, and data} to replace the "movies" entry and make it more generic.
+	in the TableHeader replace this.columns with columns, in TableBody do the same and in data={movies} replace movies with {data}.
+	
+#2 -
+	Back in moviesTable, remove import of TableBody and TableHeader as their no longer used. Import Table.
+	in the return of the render method add: <Table columns={this.columns} data={movies} onSort={onSort} sortColumn={sortColumn} />
+	This will pass the data down correctly and generically. Now the Table component has nothing specifically to do with "movies" in it as that's all just data that is getting fed into the component.
+	The moviesTable component has become a wrapper for table. So if I ever want to make a generic table for anything else I just need to call the <Table /> component and feed the columns, data, sortColumn, and onSort into it.
+	
+Sorting - Extracting a Method
+movies.jsx
+The instructor is bothered by a thing, in the render method it begins with object destructuring which is fine, but below that there is logic for determining the list of movies to display which is polluting the render method.
+IE: the filtered, sorted, and movies constants.
+Ideally we should just have the return output, so I'll cut the code from there and add a new method called "getPagedData" where I will move all of that code into.
+
+Back in the render method, there are 2 things I need there. First I need the total number of movies after the filter is applied as well as the movies in the current page.
+So, the new method needs to return an object with the properties { totalCount: filtered.length, data: movies };
+Then we can go back down into the render method and just before return define a new constant, called result, and set that to be equal to this.getPagedData()
+Here I can use object destructuring to get the properties I need and instead of calling it result use: { totalCount, data }
+Then I can go through and replace any instances of filtered.length with "totalCount" and then I could either replace movies with data... or I can just rename the destructured data field to "movies" by using {totalCount, data: movies} and not change those at all.	
+
+Now, there are a few errors to clean up, I need some properties of the state object. So just like I used object destructuring in the render method I'll do the same to add those properties to the new getPagedData one.
+
+Finally, everything is working and the render method is cleaned up, only focused on rendering, with the non-needed filtering elements removed from it.
+
+
+Destructuring Arguments
+One last thing to improve, on the table.jsx on line 6 I'm doing object destructuring.
+To break this apart I simply need to remove "props" as the argument to the function, add the parenthesis back, then move the whole object that I'm destructuring into the parenthesis.
+IE:
+	const Table = props => { const {columns, data, onSort, sortColumn } = props;  becomes:  const Table = ({columns, data, onSort, sortColumn })
+I also no longer need the "const = props;" part left over after this, so it can simply flow straight into the return statement, making the function cleaner and shorter.
+I'll go on and do the same to other common SFC's in the code.
