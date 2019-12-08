@@ -1,0 +1,62 @@
+Adding routing to the router-app:
+
+Since React is a library for display it does not have built in routing.
+To handle this I'll install react-router-dom @ 4.3.1
+
+in index.js import { BrowserRouter } from 'react-router-dom';
+
+Then, in the ReactDom.render the <App /> tag needs to be wrapped by the <BrowserRouter> tag like so:
+	ReactDOM.render(<BrowserRouter><App /></BrowserRouter>, document.getElementById('root'));
+	
+The BrowserRouter component grabs the history object in browsers and passes it down the component tree. Anywhere in the component tree we will be able to use the history object.
+
+Next I need to register the routes. This means I need to tell React what component should be rendered based upon a given URL. 
+
+Over in App.js, import { Route } from 'react-router-dom';
+Now lets say I have a section of content: I add a <div with an arbitarary className of "content", it doesn't really matter what its called.
+Next, I need to register one or more routes.
+	Inside of that div I put in the <Route> component with 2 props: path="", component={}
+So this route is a component just like the ones I've built before, it has attributes and those attributes will be passed as props.
+I'll set the path as "/products" and the component as Products.
+	The Products component is already imported in this case, otherwise it would need that too.
+	
+So, the Route component looks at the current url, if it matches the pattern it'll render the component.
+I'll copy that line a few times and change the path.
+Code:
+	        <div className="content">
+			  <Route path="/products" component={Products} />
+			  <Route path="/posts" component={Posts} />
+			  <Route path="/admin" component={Dashboard} />
+			  <Route path="/" component={Home} />
+			</div>
+
+
+**** EXACT ATTRIBUTE & SWITCH COMPONENT ****
+The pages render, however the "HOME" appears in each page. Why?
+The matching algorithm the route component uses looks in the current URL and checks if it starts with the string in path=. If it has it, that component will be rendered.
+IE: if we go to /products, then products will be rendered. likewise if I we go to /products/new the products will also be rendered since it has /products in it as well.
+Likewise since the slash in home starts all of them, it also gets rendered because it is not unique.
+Fix #1 -
+One way to fix this, other than using unique paths, is to use the "exact" attribute inserted after path. This means the component will only be rendered if the path is exactly that string.
+	IE:  <Route path="/" exact component={Home} />
+	
+Fix #2 -
+The other solution is to use the switch component. 
+in the import add Switch. 
+	IE: import { Route, Switch } from 'react-router-dom';
+Then, wrap all of the routes with a switch element. The switch will render the first child that matches the location.
+	IE: 	
+		<div className="content">
+			<Switch>
+			  <Route path="/products" component={Products} />
+			  <Route path="/posts" component={Posts} />
+			  <Route path="/admin" component={Dashboard} />
+			  <Route path="/" component={Home} />
+			</Switch>
+		</div>
+		
+So, in this implementation if I browse to /posts, the /posts will be the first entry that it matches and it will ignore the others. Order of operations is important here, if I put the home path
+at the top, it will result in a race condition and the other Routes will never be valid as the switch will always match home first. So they need to be ordered such that the most specific ones are on top and the most 
+generic at the bottom.
+
+		
