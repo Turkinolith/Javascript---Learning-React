@@ -1,0 +1,20 @@
+
+There is an issue with the routing implementation
+To see it, go to developer tools and go to the network tab, as I click any of the links in the routing list I'll see a bunch of http requests to the server. 
+	First request is: a sockjs-node get, followed by localhost which is the request to download the HTML page, next is to download bundle.js which is the combination of all of the JS code.
+	While in a small app this isn't a problem, in a large app or production page you dont want to have the user to re-download all of the JS code along with the HTML every time they navigate to a new page.
+	Example of a page that does this correctly is Gmail, as you click on an email it very quickly loads that one tab of info, it doesnt redownload the whole page every time.
+	
+Pages built so they don't reload each time the user opens a page within it is called a Singe Page Application, or SPA.
+
+In a SPA, when the user navigates from one page to another instead of reloading the whole page with all of its assets we should only update what we have in the content area.
+
+So, how to do this and avoid a full re-load when each link is clicked?
+In the navbar.jsx component there are a bunch of anchors within LI's. all of the anchors need to be replaced with a <link> component from react-router-dom
+So, import { Link } from "react-router-dom" and replace all the anchors and their close tags.
+Link doesn't have an href attribute, but it has one called "to" so replace them with that.
+
+Now, when the page is refreshed and you click any of the links, they don't send new requests to the server since the content for those components are already located in the bundle.js.
+Whats going on is if you look in the tools inside the link, it has a standard anchor element within it, however it has an "onClick" that gets passed to a handler function, so when clicked the handler is called and 
+it prevents normal function of an anchor. So thats why the browser will not send a new update.
+Instead, that handler will only update the URL, now that it is changed one of the routes will match depending on the URL and we will get a new component in the DOM.
