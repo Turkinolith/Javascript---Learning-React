@@ -1,6 +1,10 @@
 From the command line use the command:
 
-create-react-app appname
+create-react-app appname 
+* Outdated use:
+npm init react-app my-app
+* also see https://create-react-app.dev/docs/getting-started
+
 
 This will install React and all the 3rd party libraries we need:
 Development Server
