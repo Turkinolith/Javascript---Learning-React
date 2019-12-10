@@ -1,0 +1,8 @@
+In my example the props of the "products" selection is:
+history, location, match.
+I didn't pass those props so where did they come from? It's one of the things the <Route> component does.
+The <Route> component is essentially a wrapper for the component={} passed in it. So if the path matches the pattern, it'll render the component and auto inject those 3 props into it.
+Uses History to work with the history object in the Browser and with that can send the user to a different page.
+Location represents where the app is now.
+Match contains info about how the URL matched the path set in the route.
+For more info look at the React Router docs https://reacttraining.com/react-router/core/guides/philosophy
