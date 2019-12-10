@@ -1,0 +1,32 @@
+Route Parameters:
+There are times that I'll need to pass a parameters into routes.
+An example is the list of products in my router-app. Depending on which product I select from my list of products I should see a different product ID in the URL. That's a route parameter.
+
+How to pass and retrieve route parameters:
+In my App.js I'll define a new route for the product details page just below the <Switch> tag:
+<Route path="/products/   <-- Here is where I need to add a parameter like ":id", 
+
+****Remember: 
+	To define a parameter I have to prefix it with the colon. To define multiple parameters add a forward slash then another colon. IE: path="/posts/:year/:month"  this has the parameters year and month.
+
+Back to the products refactoring, add a new component linking to {ProductDetails}
+IE: <Route path="/products/:id" component={ProductDetails} />
+Note: I already had this component imported on the top, it would need imported if I didn't already have it.
+Note: This route is more specific than the one following it, path="products/:id" vs path="/products", so that is why it is placed ABOVE the other.
+Save and view the products page in the browser, go to a product entry, open react dev tools and inspect the ProductDetails component.
+There inspect the match prop, it has a params field, open that up and note that it has id: "1".
+This is coming from the URL "/products/1"
+So, we can read the route parameters passed to a component using the match object.
+
+Now, in productDetails.jsx:
+in the render method I'd like to render the ID of the product in the heading.
+So, in the <h1> add an expression: {this.props.match.params.id}
+It will now look like this: <h1>Product Details - {this.props.match.params.id} </h1>
+Now, the product ID will be displayed in the page heading when each product is clicked on.
+
+*** Page Reload on Product Link Click:
+	As I click on each product I have a complete page reload.
+Why? Because in the products.jsx it is rendering an anchor element <a href={`/products/${product.id}`}>{product.name}</a>
+To fix this on products.jsx I import { Link } from react-router-dom. then replace the <a> tag with <Link
+Also: Replace href= with to=
+No longer have a full page reload.
