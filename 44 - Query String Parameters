@@ -1,0 +1,31 @@
+*********************************
+**** Query String Parameters ****
+*********************************
+Even though I learned how to define optional parameters, they are generally something I need to avoid.
+In this particular case, having optional parameters in the URL makes sense because it gives a nice structure in the URL.
+But generally speaking when dealing with optional parameters instead of including them in the route I should include them in Query string.
+A query string is what we append to the URL using a question mark. 
+IE: 
+	Base URL: localhost:3001/posts
+	With Query String: localhost:3001/posts?sortBy=newest&approved=true
+		Now, I can apply that query string on any combination of the posts route.
+		IE: all of the posts, only those in a given year, or a given year and given month, etc.
+		These optional parameters can always be added on the right side.
+
+How to read these parameters within a React application:
+Open dev tools, go to components and search for the Posts component. 
+In the props: I've already seen the match object and used it to extract the route parameters. Query String parameters are located in the "location" object.
+"location object" Look at the "search" property. Its value is the entire query string.
+Now, I don't want to manually read the string, parse it, and extract the value for the parameters. So in the terminal I'll install a new package: 
+	npm i query-string
+	This is a very popular package for working with query strings.
+
+In posts.jsx: in this functional component I'm currently destructuring the props object and getting the match property. I'll also add "location".
+I'm going to get location.search, this is a string as I saw looking at the property, I'm going to parse this with the query-string package.
+	import queryString from 'query-string';
+this object has a parse method:
+	queryString.parse(location.search); 
+This will return an object with properties based on the parameters in the query string.
+	So in the example above it has 2 parameters: "sortBy" and "approved", this object will have properties named accordingly. 
+	So, I can either store everything in one object or use object destructuring to immediately extract the sortBy property.
+	Note, the returned object values are always strings, so if I want to work with numbers or bools returned I'll need to parse them accordingly.
