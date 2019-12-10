@@ -1,0 +1,12 @@
+As noted before, the Route component passes 3 props to linked components. One question may be, what if I want to pass additional props to those components?
+An example would be: Before routing I could pass props to the products component like this: <Products sortBy="" />
+So how to set additional props with a route?
+To do so instead of using the "component" attribute use the "render" attribute.
+IE: <Route path='/products' render={() => <Products /> } />, there in the returned Products component you can add props:
+	IE2: <Route path='/products' render={() => <Products sortBy="newest"/> } />
+The arrow function in the render attribute takes no arguments and it returns a products component. 
+
+**NOTE: The new returned Products no longer has the "history, location, match" props. How to add them back?
+add props as an argument for the render attribute function, then have to add them as passed values for the returned component along with the new props.
+How to do this? Use a special syntax in JSX. pass an object, then use spread operator and pass props object.
+<Route path='/products' render={props => <Products sortBy="newest" {...props}/> } />
