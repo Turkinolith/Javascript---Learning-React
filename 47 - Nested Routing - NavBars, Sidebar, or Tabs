@@ -1,0 +1,41 @@
+************************
+**** Nested Routing ****
+************************
+Example is an Admin Dashboard on the example project that has a set of links that will appear when an option is clicked, when any of those links are clicked they in turn will display the content of that page on here as well.
+In first glance one might wonder what is the use case for this.
+The links provided for the main list: "Home", "Products", "Posts" et cetra. are the links for an imaginary navigation bar. 
+When going to the Admin Dashboard we could have another nav bar on the top or a side bar on the side or even tabs. As each tab is selected we see new content.
+This is called Nested Routing.
+So, we have routing on the top and on the bottom.
+
+How to implement this:
+open dashboard.jsx under components/admin.
+Add 2 links, so first:
+	import { Link } from 'react-router-dom';
+
+Now, add <ul>, inside that add a <li>, inside that have a <Link> with the [to=''] set to an empty string. shorthand for this is ul>li>Link[to=''], we want 2 list items so put it within
+paren and multiply by 2:  ul>(li>Link[to=''])*2, then hit tab.
+the first to should be /admin/posts and called Posts, the second to /admin/users and called Users
+
+The <ul> and all of the above should, ideally, be part of a separate component like navbar or sidebar or tabs so I'll quickly extract those elements and put them in a seperate component.
+
+In the admin folder I'll add a new file, sidebar.jsx. Import react and create a functional component, I'll name it "SideBar"
+
+back in the dashboard I'll move the UL and all its children into the sidebar component as return.
+Also I'll move the LInk import into the new component as well.
+Now, I'll add the sidebar into the Dashboard where I extracted the <ul>
+
+After the Sidebar I'll have the content area. Here I can use the Route component just like I used it in App.js to render a component in the content area of the app.
+
+Back in the dashboard I'll add a few routes.
+Code:
+    <div>
+      <h1>Admin Dashboard</h1>
+      <Sidebar />
+      <Route path="/admin/users" component={Users} />
+      <Route path="/admin/posts" component={Posts} />
+    </div>
+	
+**NOTE: Pay attention to capitalization of "component", it is case sensitive. capitalized won't work.
+
+What matters is if the current URL matches one of these paths, then I'm going to get the component at that location.  
