@@ -15,6 +15,7 @@ How can I make parameters optional?
 Append a question mark to them after parameter name.
 This is part of regular expressions in JS. in regexes when you append a question mark that means that expression is optional.
 
+**** USING MATCH OBJECT ****
 In posts.jsx I can either pass props as an argument to the Posts function, or I can destructure it and pass the match object { match }
 Then, I can extract the Route parameters.
 IE: Year: {match.params.year}, Month: {match.params.month}
