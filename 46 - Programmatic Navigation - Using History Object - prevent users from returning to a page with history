@@ -1,0 +1,23 @@
+*********************************
+**** Programmatic Navigation ****
+*********************************
+There are times you want to redirect the user when they click a button or submit a form.
+EX: in the product lists, go to one of the products. Imagine there is a form and a save button below that form.
+	When the user clicks that button we want to take them back to the Products page. This is called programmatic navigation.
+How to do this?
+
+**** USING HISTORY OBJECT ****
+Open React Dev tools and look for the ProductDetails component.
+So far I've seen the Match and Location Objects, now lets look at "History" object.
+	This object has a bunch of useful methods for navigation, such as "goBack()", "goForward()", "Push()", and "Replace()"
+	NOTE: The Difference between Push() and Replace() is that Push() will add the new address in the browser History, so you can click the back button and go back to where you were. Replace replaces the current
+	address, so we won't have history.
+
+To implement programmatic navigation go to the productDetails component and find the handler for the Save button.
+	To have the user be taken back to the products page we need to write code like this:
+	this.props.history.push('/products')
+Save the change and verify that when clicking the save button on a product page that I'll go back to the /products page.
+	With this implementation if I click the browser "back" button I'll be taken back to the Product Details page.
+* To see the replace method in action change .push to .replace.
+	Testing the changes shows that the back button wont work to return you to the page you were just on after being taken from product details to the product list.
+		**** This method is often used for log-in pages so when the users logs in they go to a new page. If they click the back button you don't want them going back to the log-in page.
