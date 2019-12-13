@@ -12,6 +12,7 @@ IE:
 		IE: all of the posts, only those in a given year, or a given year and given month, etc.
 		These optional parameters can always be added on the right side.
 
+**** USING LOCATION OBJECT****
 How to read these parameters within a React application:
 Open dev tools, go to components and search for the Posts component. 
 In the props: I've already seen the match object and used it to extract the route parameters. Query String parameters are located in the "location" object.
