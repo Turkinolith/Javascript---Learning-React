@@ -1,0 +1,40 @@
+*******************
+**** Redirects ****
+*******************
+Lets see what happens when a user attempts to go to an invalid page such as: localhost:3000/xyz //takes user to home component.
+This isn't what I want, I'd prefer to take the user to a "not found" page.
+
+Before I implement that, lets review one more time why I'm seeing the home component:
+in App.js, I have a <Switch> component along with routes. In this particular case, because the bottom Route path="/" matches that URL, that is why I'm seeing the home component.
+But what if I apply the "exact" attribute after path? IE: it will only show the home component if the user is at the root of the website.
+	code:
+		<Route path="/" exact component={Home} />
+		
+Now I don't see the home component anymore if I put in an invalid path.
+But, I still would like to redirect if they put in an invalid page.
+
+Back in App.js, I need to import another component from "react-router-dom", Redirect.
+	code:
+		import { Route, Switch, Redirect } from "react-router-dom";
+
+I'll use it at the bottom of the <Route/> stacks, this is because if we reach that point that means none of the routes were valid.
+	code:
+		<Redirect to="/not-found" />
+		
+What do I want to display to the user at this URL? Well, I need to register a new route with that path and the NotFound component.
+So, just above the home route, I'll add a new <route/> entry and point it to "/not-found" and set the component to NotFound (which is already imported)
+	code:
+		<Route path="/not-found" component={NotFound} />
+
+So, the end result is if I put in any invalid URL I get redirected to the /not-found path (it shows up in the URL path) and it displays the Not Found component, which is just an <h1> that has "Not Found" in it.
+
+*** Other uses of Redirect ***
+Sometimes you want to move resources on your website from one URL to another one. You can use the Redirect component to achieve this.
+Ex:
+	Add a new <Redirect into the <Route structure, but instead of setting "to" set "from" AND "to", this way it'll be matched if the current URL matches what is passed into the "from" field then it will
+	redirect the user to the new destination set in to
+	
+	<Redirect from="/messages" to="/posts" />
+	So, if the user navigates to /messages, I redirect them to /posts.
+	Ex: type in http://localhost:3000/messages and I get redirected to http://localhost:3000/posts
+	
