@@ -39,3 +39,14 @@ Code:
 **NOTE: Pay attention to capitalization of "component", it is case sensitive. capitalized won't work.
 
 What matters is if the current URL matches one of these paths, then I'm going to get the component at that location.  
+
+
+**********************
+**** EXERCISE  *******
+*********************
+
+Here I did an exercise to add a navbar and routing to the vidly app so that you can click the title of each movie
+and be brought to a page where you can see the ID# for that movies entry in the DB. Also a notfound page, and currently placeholder "rentals" and "customers" page.
+Clicking the Movies Link or the "navbar" text returns the user to the DB.
+
+I didn't cover the step-by-step of doing it, but you can see the end result code in the vidly app.
