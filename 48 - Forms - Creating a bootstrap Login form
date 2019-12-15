@@ -1,0 +1,79 @@
+***************
+**** FORMS ****
+***************
+
+#1 - Building a login form with Bootstrap
+
+((( SETUP THE COMPONENT )))
+In components folder of the Vidly app, create a new file: loginForm.jsx
+	import react and component.
+	create a component class called LoginForm.
+		No state needed.
+		It will return a basic <h1>Login</h1>
+		
+Now register a new route in app.jsx
+	import LoginForm from ./components/loginForm
+	Duplicate a route entry, I chose the first one, and change the path to /login and component to {LoginForm}
+		*I ordered the components together so they are easier to read.
+		
+Next, add a link to the login form on the navigation bar.
+	go to navbar.jsx in components/common
+	Here I duplicate the last <NavLink> component, change the to="/login' and text to Login.
+		*Sidenote: I had all of my NavLinks nested within a <ul> and <li>'s. This looks exactly the same without this so I removed those elements.
+	
+Quick test: I have the login link on the navbar, I click it and it displays the login component. Good. Time to build the bootstrap form.
+
+
+((( BUILD THE LOGIN FORM )))
+
+Go to the bootstrap docs and look at the needed markup to create a form.
+I need a <form> element, inside that a <div with class "form-group"
+	WIth this div we group the label to the corresponding input field.
+	Inside the div there is: <label, <input, and some text in a <small tag, to give the user a hint about what to do.
+	
+	**NOTE: each label ( 1 for the username, 1 for the password ) has a for=" attribute with a unique string. "exampleInputEmail1" or "exampleInputPassword1" 
+			The value of that for= is the id="" of a given <input/>. With this, when the user clicks on the label text, the referenced input gets automatically focused.
+			
+	**NOTE: Also note that <input> has the class="form-control"
+
+Back in the loginForm.jsx:
+	Wrap the <h1>Login</h1> with a div. 
+	
+	**Cool Trick: highlight all the text and press shift+ctrl+P, this opens the command bar in VSCode. type in there "wrap" and select "Wrap with Abbreviation", press enter.
+				Now, you will have an empty bar with hint text "Enter Abbreviation", type the tag that you want to surround the text with. "div" Now the text is surrounded by a div tag!
+				You can also do zen coding here, "div.container" and it will give it the proper classContainer attribute for a .jsx, however we just need a plain div here.
+				
+	Now I need a: form>div.form-group>label+input.form-control, I need 2 of these so I'll select everything from "div" over to the right, add paren around it all and *2 then hit enter.
+		Now I'll get 2 fully set up divs with label and inputs.
+		I don't need the action="" part of the form tag, so I get rid of that and fill out the labels for "Username" and "Password".
+	
+	The next thing I need to assign is the 'htmlFor=""' attribute.
+		**NOTE: "For" is a reserved keyword in JS, so it is called here htmlFor, for the same reason I can't use class and have to use "className" instead.
+	I add an 'id=""' field to both input tags, I set one to username and the other to password. I do the same for the "htmlFor=" field.
+	
+	Finally, I need a submit button so just outside of the form <div/>'s I add a <button> in, set the className to "btn btn-primary" and label it "Login"
+	
+		Final Code:
+		
+class LoginForm extends Component {
+  render() {
+    return (
+      <div>
+        <h1>Login</h1>
+        <form>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input id="username" type="text" className="form-control" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input id="password" type="text" className="form-control" />
+          </div>
+          <button className="btn btn-primary">Login</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+Now, if I check http://localhost:3000/login I'll get the login form with submit button.
