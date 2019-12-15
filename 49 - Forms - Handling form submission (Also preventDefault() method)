@@ -1,0 +1,27 @@
+**********************************
+**** HANDLING FORM SUBMISSION ****
+**********************************
+By default, HTML forms make a full round-trip to the server.
+	Example: 
+	Go to the login page and open network tab on dev tools and clear the content of the tab.
+	Click the login button to submit the form.
+	There will be a full page reload, the login html page as well as bundle.js are re-downloaded from the server.
+		This isn't the type of behavior you want from a REACT app.
+	
+	How to properly submit a form in React:
+		on loginForm.jsx, look at the <form> element.
+		All <form> elements have an event called "onSubmit={}"
+		I'll set this to a handler called "handleSubmit" that takes an event object as an argument.
+			Code: 
+				handleSubmit = event => {}
+		This event object has a method: e.preventDefault()
+		****NOTE: event: preventDefault() prevents the default behavior of this event. In this case submitting the form to the server which causes a full page reload.
+				
+		At this point I will call the server, save the changes, and then redirect the user to a different page.
+		
+		For now, I'll just console.log("Submitted")
+		finally, down in the form element pass {this.handleSubmit} for the onSubmit event.
+	
+	Verification:
+		Reload the page and check the network tab again, when the login button is clicked note that there isn't any network activity.
+		If you look on the console tab, note the "Submitted" message
