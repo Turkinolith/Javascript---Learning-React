@@ -1,0 +1,27 @@
+**********************************
+**** Handling Multiple Inputs ****
+**********************************
+
+In the handleChange method I'm currently only setting the username property of the account object. It doesn't make sense to create another handler for the password Property.
+So, I'd like to set the property dynamically.
+	As mentioned before, whenever you want to work with properties of an object dynamicly instead of using dot notation use bracket notation.
+	IE: account[''] and use a string that identifies the name of the target property.
+	Where do I get the value of the string? 
+	I can give each input a "name" property and read it like this: account[event.currentTarget.name], then in the <input for username add name="username" and in <input for password add name="password"
+	Similarly, I add value and onChange to password as I didn't have that set up already.
+
+	Next, I use some object destructuring for the render method since I'm using a lot of this.state stuff a lot. 
+	const { account } = this.state;
+		now I can get rid of a lot of the repetition and shorten the code to: account.username and account.password
+		
+	NOTE: Since I'm only using a single property of the event object, currentTarget, I can use object destructuring to clean the code up slightly.
+		handleChange = ( { currentTarget: input })   <-- This is both destructuring the object, only picking out the currentTarget property, then renaming it to "input" within the scope of this function.
+		New final code:
+			handleChange = ({ currentTarget: input }) => {
+				const account = { ...this.state.account };
+				account[input.name] = input.value;
+				this.setState({ account });
+			};
+			
+	Save the changes: Now the state is in complete sync with the login form!
+	
