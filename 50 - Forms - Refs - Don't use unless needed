@@ -1,0 +1,33 @@
+**************
+**** REFS ****
+**************
+When submitting the form, I need to get the value of the input fields.
+To get the values in vanilla JS I can do this:
+document.getElementByID('username');  Pass an ID to the getElementByID, like "username" this returns an input field, now access the value property to get the username.
+	code:
+		const username = document.getElementByID('username').value;
+****NOTE: THIS IS NOT HOW I SHOULD DO THIS IN REACT. In React you should never work directly with the document object.
+
+In order to get access to the username element, I need to give it a reference.
+First in the component I need to define a property
+	in loginForm.jsx:
+					username = React.createRef();
+	This will create a ref object.
+	Down in the  <input /> tag add the property ref={this.username}
+
+Now, when submitting the form, if I want to get the username instead of working with document.getElementByID I'll work with: this.username.current.value;
+So, if I really need to access the DOM, this is the way to do it.
+
+When building forms there is a better way, I'll investigate that next lesson.
+
+As a rule of thumb, minimize use of Refs. use them only when you know what you are doing, IE: managing the focus of an input field and you really want a reference to the DOM element or you are working
+with a 3rd party DOM library.
+
+Let's see how to use REF to set focus on a given input field.
+
+In the component I'll add a lifecycle hook: componentDidMount() when it is mounted I want the username input field to get focus.
+this.username.current.focus();
+Back in the browser, when loading the login page now the Username field has focus immediately.
+
+One could say there is a better way: instead of defining a ref, calling componentDidMount, etc, just simply use the "autoFocus" attribute on the input field. (Note the camelcase naming.)
+As you see, it still works. Don't use refs unless they are really needed.
