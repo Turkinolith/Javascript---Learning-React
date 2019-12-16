@@ -1,0 +1,42 @@
+
+*****************************
+**** Controlled Elements ****
+*****************************
+
+When building forms often a form component has a state that is initialized based on what we get from the server.
+Example: Instead of building a login form, I was building a "movie" form. In the form we need to call the server, get the movie with a given ID, store the state, and then populate the form.
+	loginForm.jsx: 
+	Add a state property to the class.
+	Set it to have a property "account" that is an object with 2 properties "username" and "password" both set to empty strings.
+	
+Back in the browser look on the login form and put some text into the username field, open react devtools and look for "LoginForm" and look at the state object.
+	account: Object
+		password: ''
+		username: ''
+	This username property is completely detached from the "username" field. because the input fields have their own state whatever is typed there is stored in the input field. 
+	To solve this problem, should get rid of the input field state and only rely on the state object so as to maintain a single source of truth.
+
+How to get rid of the input field state and rely on the class state?
+	convert the element into a controlled element. Remember controlled components? controlled elements are the same. They don't have their own state, they get their data via props and notify changes
+	to the data by raising events.
+	
+	Add a value property to the first input tag set to: value={this.state.account.username}
+	With this change, the input element will no longer have its own state. We are using props to set its value. So its value is always coming from state.account.username
+		NOTE: With this change, if I type something in the browser nothing will happen. This is because the username property is an empty string and because I've bound the value of the input field 
+		to the username in the state it is always showing an empty string. 
+		To solve this issue, I need to handle the changeEvent of this input field. Whenever something is typed here that event is raised and thats a good time for us to get what the user typed and update the state.
+		updating the state will cause a re-rendering of the form so the input field will be re-rendered with the updated state.
+	To fix the rendering add the property: OnChange to the input element, setting it to this.handleChange.
+		onChange={this.handleChange}
+	
+	Now, lets implement this method.
+	handleChange = event => {
+	  const account = {...this.state.account};
+	  account.username = event.currentTarget.value;
+	  this.setState({ account });
+	};
+
+	Now if I open the login form and start typing, the test I type updates in the field. If I look in the components tool and look at LoginForm I see the same text I typed is now
+	displayed as the state of username.
+	
+	But what about the password? That'll be covered next.
