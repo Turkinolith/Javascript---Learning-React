@@ -1,0 +1,13 @@
+**********************************
+**** Common Errors with Forms ****
+**********************************
+#1 - Missing state property -
+ "A component is changing an uncontrolled input of type text to controlled"
+ I removed a property, like username. So if I try to access account.username I'll get "undefined". 
+ Undefined and Null can not be used as values of a controlled element.
+ in other words when I'm setting the value of a username field if I pass undefined or null there React will not see that element as a controlled element. So this element will have its own state and value but the moment I type the first
+ character, because I'm listening for the change and updating the state, now account.username becomes "value" and now I'm passing it as the value of that inputfield and thats why I get the warning. Initially I start with an uncontrolled element
+and now its a controlled element.
+
+#2 - Initialized property with undefined or null
+	Similarly, I'll get an error if I start a component with null or undefined as a state value. I can't do that. Use an empty string or some value I get from the server for a component
