@@ -1,0 +1,30 @@
+*************************************
+**** Extracting a Reusable Input ****
+*************************************
+
+In the current implementation there is some duplication:
+	For each Input there is a <div className="form-group">, as well as a <label, and <input< field. Also some values are repeated. the value of the htmlFor=, which is "username" in the label is exactly the same as the id and name attributes of the <input>.
+	We've repeated the same pattern in the password input as well.
+	Nows a good time to extract the markup and put it within a reusable component.
+	
+So, in the common folder lets add a new file called input.jsx, import react and use a SFC since we don't care about state. Call it Input which takes props as the argument.
+	Go back to the login form and Select the first container div with label and input and cut them and paste them into the return of the new component.
+	Now lets make the necessary changes.
+		#1 I have "username" in 3 places. lets replace these with {props.name}. Or make the code better and destructure the argument props into: ({ name }) and just replace the props.name with name.
+		#2 Replace "username" with something from props. I'll call that {label}, and add that to the props destructuring as well. 
+		#3 next I'll get rid of account.username and destructure that to {value} and once more, add that to props destructuring.
+		#4 finally, replace this.handleChange with {onChange}
+	So: ({ name, label, value, onChange }) is the interface of the Input component.
+
+Now, back in loginForm.jsx, import Input from './common/input';
+	Down in the return where we cut the data out we add in <Input />, now lets add the props into it: <Input name="username" value={account.username} label="Username" onChange={this.handleChange} />
+	
+Now, I can get rid of the Password field and its div, etc, Paste in the <input> and change the fields to point at the password field
+		<Input
+            name="password"
+            value={account.password}
+            label="Password"
+            onChange={this.handleChange}
+          />
+
+Now, the text is far easier to read and understand.
