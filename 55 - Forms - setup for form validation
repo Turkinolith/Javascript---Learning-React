@@ -1,0 +1,21 @@
+********************
+**** Validation ****
+********************
+Almost every form needs some kind of validation.
+	Initially I'll validate on submission of the form, but later on I'll go over validation as the user types.
+	
+In terms of implementation in the State Object just like I have a property that has all the data of the form I'll have a property that holds all of the errors it could have. 
+Initially I'll set it to an empty object and if there are errors I'll add them like:
+	errors: { username: 'Username is required.' }
+	Note: I'm using an object instead of an array as it is far easier to find the errors for a given input field.
+		Example: I can find the errors for the username field like this errors['username']
+			If I had an array I'd have to do something like: errors.find(e => e.name === 'username')
+			
+In the "handleSubmit" method I'll call a method like validate. this.validate(); it'll return an object that looks like errors.
+	const errors = this.validate();
+	this.setState({ errors });
+I can assume that if there are no errors that method would return null so I can check if (errors) return: so I don't call the server.
+
+	validate = () => {
+	return {username: 'Username is required.'};
+	};
