@@ -1,0 +1,39 @@
+*******************************************
+**** A Basic Validation Implementation ****
+*******************************************
+
+Now I'll implement a basic form of validation that I started in the previous lesson:
+loginForm.jsx, in the validate method define an object, errors. set it to be an empty object.
+Then for each input field I'll write some validation logic like this: If this equals an empty string I'll add a property to the errors object. I'll also need to repeat the same logic for the password field, so now is a good time to destructure the statement.
+	if (this.state.account.username.trim() === '')
+		errors.username = 'Username is required.'
+
+Destructuring assignment:
+	const {  account } = this.state;
+Now the above becomes:
+		if (account.username.trim() === '')
+		errors.username = 'Username is required.'
+
+And now final code with password added on:
+	  validate = () => {
+    const errors = {};
+    const { account } = this.state;
+    if (account.username.trim() === '')
+      errors.username = 'Username is required.';
+    if (account.password.trim() === '')
+      errors.password = 'Password is required.';
+	  
+	return { username: "Username is required." };
+  };
+  
+  This is a very basic validation, it's not very salable. Later on I'll go over how to replace this with a more flexible and sophisticated one.
+  Right now these validations only check if a value exists, later on I might want to do a more complex check with regexes or other methods to validate requirements on format.
+  
+  Finally, instead of returning that object, I should either return null if there are no errors or the errors object:
+  
+	return Object.keys(errors) <-- This will return all of the keys of the error object.
+	return Object.keys(errors).length === 0 ? null : errors;
+	
+  To test this, in the handleSubmit when I call this.validate(); I'll do a console.log of (errors)
+  Verified that it returns the password error when that is missing, and a username error when it is missing, and both if both are missing.
+  Also fixed a bug: before the "console.log("submitted")" I needed to add an: if (errors) return;
