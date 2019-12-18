@@ -1,0 +1,28 @@
+**************************************
+**** Displaying Validation Errors ****
+**************************************
+Currently the status of the implementation of the input component is:
+	it is responsible for rendering the label. 
+	And an input field.
+	I'm also going to give the responsibility of displaying an error message related to the input field to the input component.
+	After the input field I'll add a div with 2 classes: alert and alert-danger (these are both bootstrap classes)
+	in this Div I'll want to render the error message, so I should on the top get the error prop and render it there.
+		<div className="alert alert-danger">{error}</div>
+	Now, I only want to render this div if {error} has a value. So with the div selected I'll put it in an expression:
+		{error && <div className="alert alert-danger">{error}</div>}
+		NOTE: This technique was discussed in the section regarding conditional rendering in the component section.
+			If error is "truthy" then the div will be returned, otherwise it'll be ignored.
+			
+	Back to the loginForm, I'll need to pass the error prop to the input components. So, within them I'll add error={this.state.errors.username} and error={this.state.errors.password}
+		Actually, it's better to use object destructuring here. So just like I pick the account property I'll also pick the errors object.  const { account, errors } = this.state;
+		Now they become: error={errors.username} and error={errors.password}
+		
+	I get the errors displays now in the browser, but an error when both have text.
+		TypeError: errors is null. or, in Chrome: Cannot read property 'username' of null
+	The reason for this error is the Input properties are trying to access {errors.username} or {errors.password} and they are obtaining "null"
+	This happens because in the handleSubmit if I don't have any errors it'll call validate that sets errors to null and it then sets the state.
+	To fix this, I'll need to change line 25 of my code which is currently: this.setState({ errors }); to something like this: 
+		this.setState({ errors: errors || {} });
+	If there is an error object, it is truthy, set the state to the Errors object, if it is null, instead set it to an empty object.
+	This way the errors state is always set to an object and never be null.
+	
