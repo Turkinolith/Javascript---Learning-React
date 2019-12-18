@@ -1,0 +1,52 @@
+
+*********************
+**** Module: Joi ****
+*********************
+
+To implement validation rules, I'll use a 3rd party library called "Joi"
+https://www.npmjs.com/package/@hapi/joi
+
+An example of its use can be found at https://hapi.dev/family/joi/?v=16.1.8
+	EX: set a username to be a string, that must be alphanumeric, with a min of 3 and max of 30, and that it is required.
+	username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required(),
+	Or: take a regex that fits the pattern: (optional string, must satisfy the regex) 
+		password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+It can be predefined validators but you can also add your own.
+
+in terminal I'll install it: npm install @hapi/joi
+Now, Import it into the loginForm.jsx
+	import Joi from '@hapi/joi';
+
+In the LoginForm component I should now define a schema. This doesn't have to be part of the state because its not supposed to change.
+**** NOTE: The way validate works changed since the tutorial was created. I now need to assign a Joi.object to the schema and use validate on the schema instead:
+  schema = Joi.object({
+    username: Joi.string()
+      .alphanum()
+      .min(3)
+      .required(),
+    password: Joi.string()
+      .min(5)
+      .required()
+  });
+  
+
+So, I have a schema now I can validate the object with one line of code. In the validate method:
+	const result = this.schema.validate(this.state.account);
+
+I console.log this and submit the username/password without filling them and I get an error object in console:
+it has only one item, because by default Joi terminates validation as soon as it finds an error. So I need to pass options into the validate function. 
+	const result = this.schema.validate(this.state.account, { abortEarly: false });
+This allows Joi to return all of the errors at once.
+So, if I reload and submit, I get the return object with an array of 2 in the errors object, one error for username and one for password.
+	If I expand one of those objects it has keys for: message, also path, which is an array, and in that path I see the target property.
+	
+So, this is the object I get as a result of validation, what I need to do now is take this complex structure and convert it into a simplified structure that my app understands.
+
+In my state I have an errors object, and in this object I have zero or more key-value pairs where the key is the name of the target field and the value is an error message.
+	This, is my simplified structure.
+	Next, I'll go over how to map the object I get from Joi into the errors object.
