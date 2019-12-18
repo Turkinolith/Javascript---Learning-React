@@ -1,0 +1,67 @@
+******************************
+**** Validation on Change ****
+******************************
+To validate input on change I'll take a similar approach that I took on submitting the form.
+So, I should validate the input and set the errors object accordingly.
+
+	In the handleChange method. 
+	At the beginning do validation, but don't call this.validate as that will call the entire form.
+	if the user is typing into the username field they should see only errors in regards to it and not for anything else.
+	So, instead of calling the validate method I should call another method that I'll build called validateProperty, it'll take an input argument and return an error message.
+		const errorMessage = this.validateProperty(input);
+	Now, I'll need to update the state, so first I should clone the errors property of the state object.
+		const errors = {...this.state.errors};
+	Next, if this error message is truthy I'll store it in the errors object. 
+		if (errorMessage) errors[input.name] = errorMessage;
+		So, if the input name is "username" I'll set the username property of the errors object. I'll set that to the errorMessage I get from the validation function.
+	If I don't get an error message, I should delete the property so that it is cleared up.
+		else delete errors[input.name];
+	Finally, when calling setState I should also pass, errors.
+		this.setState({ account, errors });
+	Final Code for handleChange:
+		  handleChange = ({ currentTarget: input }) => {
+			const errors = { ...this.state.errors };
+			const errorMessage = this.validateProperty(input);
+			if (errorMessage) errors[input.name] = errorMessage;
+			else delete errors[input.name];
+
+			const account = { ...this.state.account };
+			account[input.name] = input.value;
+			this.setState({ account, errors });
+		  };
+	
+	Now, time to implement the validateProperty() method.
+	Again, this will be basic validation, I'll replace it with a better method later.
+	So, I need to check the name of the input field, if that === username add validations for it: (yes, I know I already did an empty string, this is just a basic framework and dont want to get hung up in 3rd party API's just yet.)
+		validateProperty = input => {
+			if (input.name === 'username') {
+				if (input.value.trim() === '') return 'Username is required.';
+				}
+				// ... TODO: Other things to validate.
+			}
+			// ... TODO: password validation
+		}
+		
+	Below the 2nd if I could have other rules, doesn't matter for now. Before I move on I'd like to improve the code. Note I'm repeating "input.", once again I can destructure it to make it less wordy by extracting name and value properties.
+				validateProperty = ({ name, value }) => {
+					if (name === 'username') {
+						if (value.trim() === '') return 'Username is required.';
+						}
+						// ... TODO: Other things to validate.
+					}
+					// ... TODO: password validation
+				}
+	
+	Now, lets duplicate it and set it up for the password half:
+				validateProperty = ({ name, value }) => {
+					if (name === 'username') {
+						if (value.trim() === '') return 'Username is required.';
+						}
+					if (name === 'password') {
+						if (value.trim() === '') return 'Password is required.';
+					}
+					// ... TODO: password validation
+				}
+	Now I have 2 validation functions. One that validates only one property or input and the other that validates the whole form.
+		Now I test the app, if I type something into a field, then delete it, I get the relevant error message for that field saying that it is required.
+		
