@@ -1,0 +1,55 @@
+*************************************
+**** Validating a form using Joi ****
+*************************************
+
+Looking at the object returned from Joi again: there is an error property, it is only set if there is at least one error, otherwise null. 
+Within that error object it has a property "details" which is an array of objects. So, the challenging part of this task is to map that array into an object.
+
+Back to the validate method: I'm calling this.schema.validate, I want to keep that but I'll get rid of everything else because I'll rewrite that from scratch.
+	if (!result.error) return null; 
+if result.error is falsy, return null,  otherwise get the array and map it into an object
+	const errors = {};
+Now I need to iterate over the array and for each error message add a new property to the object.
+in the details array each object has a message property and a path property. These are the ones I'm interested in.
+	The path property is an array and the first element in the array is the name of our target property.
+One way to do this:
+	For (let item of result.error.details) <- So I iterate over the array
+		  errors[item.path[0]] = item.message;  <- Each item has a path property which is an array. The first element is the name of our target property. So, using bracket notation, we set errors of, the value of the property is an error message so item.message.
+	Some developers don't like to use a for-of loop, they prefer to use .map method. We can also use .reduce but the implementation can get complicated. for clarity I'll use a for-of.
+	Finally, I'll return the errors object.
+	
+*NOTE: On testing I noticed that the error message returned: ""username" is not allowed to be empty"
+	The capitalization is off, this is because the username: field is lowercase in the schema. 
+	When displaying errors to the user we want the names to be clear as to what they are going to, case matching.
+	So, in the schema I can call another method .label and assign an override name to it: .label('Username')
+	
+  schema = Joi.object({
+    username: Joi.string()
+      .alphanum()
+      .min(3)
+      .required()
+      .label("Username"),
+    password: Joi.string()
+      .min(5)
+      .required()
+      .label("Password")
+  });
+  
+  So, I'm done implementing the validate method, but there are a few things that could be improved here.
+	#1 - I'm referencing result.error in a couple of places, so this is an opportunity for object destructuring.
+		Replace "result" in the const for "this.schema.validate" to { error }, then replace result.error with error
+	#2 - the object assign for the option for the validate method looks weird, the curly braces make it look like a code block and its being linted down into its own line making the syntax of the function call hard to read.
+		I'll define a new constant, pass that info into it, then call the constant instead for the 3rd value.
+			    const validateOption = { abortEarly: false };
+				const { error } = this.schema.validate(this.state.account, validateOption);
+	
+	
+
+**************************************
+**** Validating a FIELD using Joi ****
+**************************************
+
+*** NOTE ***
+This lesson is where the syntax change between v13 of Joi that the instructor uses and v16 of Joi which I'm using differs, and does so significantly.
+After a lot of attempts to fix this section I ultimately gave up and asked around, but having not obtained any answers within a day and still struggling with this
+I opted to go back to my old version of doing the field check using nested IF statements and will research using "express" to do validation moving forward.
