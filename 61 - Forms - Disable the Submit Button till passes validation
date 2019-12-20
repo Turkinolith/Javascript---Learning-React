@@ -1,0 +1,10 @@
+*************************************
+**** Disabling the Submit Button ****
+*************************************
+I want the "Login" button to be disabled unless the form is valid. 
+	***NOTE: Without as-you-type field validation you wont be told "WHY" the button is disabled. So, still need that at some point.
+
+In the loginForm.jsx, go to the <button element and there add a disabled attribute. It can be set to either true or false.
+So, I can call disabled={this.validate()) 
+This method either returns null or returns an object with one or more errors. If it returns null, that is considered "falsy" and is the same as passing "false" here.
+Similarly, if it returns an object it is considered "truthy" so its similar to passing true here.
