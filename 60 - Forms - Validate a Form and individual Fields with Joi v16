@@ -43,13 +43,39 @@ One way to do this:
 			    const validateOption = { abortEarly: false };
 				const { error } = this.schema.validate(this.state.account, validateOption);
 	
+	To make the validate option work correctly with v16 of Joi I wrap a copy of the schema within a Joi.object, then use that object for the validate function.
+	
+Final Code:
+	validate = () => {
+		const localSchema = Joi.object(this.schema);
+		const validateOption = { abortEarly: false };
+		const { error } = localSchema.validate(this.state.account, validateOption);
+		if (!error) return null;
+
+		const errors = {};
+		for (let item of error.details) errors[item.path[0]] = item.message;
+		return errors;
+	};
+	
 	
 
 **************************************
 **** Validating a FIELD using Joi ****
 **************************************
+Now to reimplement the validateProperty method.
+I'll take the same approach used in the validate method.
+ for the schema I can't pass this.state.account because that will validate the entire form. in this case I just want to validate a single field.
+ So, I'll create a new object. It should only have a single property. The name of it should be set dynamically based upon the value of the "name" argument.
+ So, if name is "username" it should have a property called username: and the value should be the "value" argument.
+ But, I don't want to hardcode the name, it should be set dynamically, so here is where we use computed properties.
+ Replace the hardcoded key with square brackets and pass name: [name]. So, whatever the value is passed for name at runtime will be whats used to set the key.
+ Now, I'll wrap that computed key/value pair into a Joi.object as per the Joi v16 syntax and save it into a constant called localSchema. This is essentially a filtered schema that only holds the parts relivent to the matched value.
+ 
+Final Code:
+	  validateProperty = ({ name, value }) => {
+		const obj = { [name]: value };
+		const localSchema = Joi.object({ [name]: this.schema[name] });
+		const { error } = localSchema.validate(obj);
+		return error ? error.details[0].message : null;
+	  };
 
-*** NOTE ***
-This lesson is where the syntax change between v13 of Joi that the instructor uses and v16 of Joi which I'm using differs, and does so significantly.
-After a lot of attempts to fix this section I ultimately gave up and asked around, but having not obtained any answers within a day and still struggling with this
-I opted to go back to my old version of doing the field check using nested IF statements and will research using "express" to do validation moving forward.
