@@ -1,0 +1,33 @@
+************************************
+**** Extracting a Reusable Form ****
+************************************
+1 - The first thing I need to do, is rename "account" to "data" (ctrl + H to open the replace dialogue in windows) replace all instances of "account" with data.
+
+2 - Now, create a new component called "form" and move any reusable logic into that component. Then have LoginForm extend that new component instead of the Component class in React so that it will inherit all of the methods we 
+	define in the space class.
+	
+3 - in the components/common folder I'll create a new file called form.jsx. import react and component, create a class called Form. 
+
+4 - Back in loginForm.jsx, every form should have a state and in the state we should have data and errors properties.. I'll init them with an empty object. 
+
+5 - I'll leave schema back in loginForm.jsx as that is completely dependent upon each form. But I'll move validate and validate property into the component as their reusable.
+	Cut them from loginForm and paste into Form.
+	Since I'm calling Joi in these methods I should import it into the component as well.
+	
+6 - At the bottom of the form.jsx component, I don't need the render() method as this component doesn't actually render anything, so delete.
+
+7 - Back in loginForm.jsx, next handleSubmit.  Like mentioned earlier, the first half of the method is reusable, but the 2nd half changes from one form to another.
+	To refactor this I can do the following:
+		create a new method called "doSubmit" and move those last lines into that method. Then, handleSubmit will call "this.doSubmit();"
+	Now, the handleSubmit() method is completely generic, so I can cut it and move it to the form class.
+
+8 - handleChange is entirely reusable so I'll move it to form next.
+
+9 - Everything reusable has now been extracted, so I'll have the loginForm.jsx extend the form class.
+	On the top I'll remove "Component" and replace it with "Form" and import it on the top.
+	
+10 - Test, reload and check the login page, everything seems to work!
+	So, with this refactoring I simplified my loginForm and the next time I want to build a form I don't have to build that code from scratch.
+	I'll just need to init the state, set schema for the form, determine what should happen when the form is submitted and decide what to return when the form is rendered.
+	
+BUT, I'm not done yet. next lesson I'll go over simplifying the render method.
