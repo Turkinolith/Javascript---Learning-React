@@ -1,0 +1,99 @@
+
+*********************************************
+**** Extracting Helper Rendering Methods ****
+*********************************************
+1 - Extracting the Button Render into its own dynamic method.
+
+	In the loginForm.jsx, note the submit button. Apart from the label everything else should be exactly the same in every other form. So, I can add a helper method in the Form class for rendering a submit button with a given label.
+	So, I'll cut the button markup out of the form.
+
+	In form.jsx I'll add a new method called "renderButton" pass (label) to it as an argument, and return the markup for the button.
+	I'll replace the "login" label with {label}.
+
+	Now, I can go back to the loginForm and call {this.renderButton('Login')}
+
+2 - Extract the input fields into a dynamic method.
+
+	Now look at the input fields, there is a repetitive pattern. For example the name "username" has a property with the exact same name in the data and errors objects. Also for every input we add to the form we should handle 
+	the "onChange" event. If we don't do this the form will not be in a valid state because whenever the user types something into the form we want to make sure the state is updated. We don't want to have to remember to handle the onChange event.
+	
+	So, similar to extracting the button method I'll extract a method to render an input. So I'll select one of the inputs and cut it. 
+	Back in form.jsx I'll add a new method called renderInput, then return the markup.
+	To pass a name property I'll add that as an argument to the function and replace the name value with the passed data {name}
+	To replace the name in the value and error properties, I'll use a computed value for the variable, so value={data.username} becomes value={data[name]} and likewise error={errors.username} becomes error={errors[name]}
+	Next, I need a label argument to the method since the label I want to pass may not exactly match the name and I change the label="Username" to label={label}
+		
+	renderInput(name, label) {
+		return (
+		  <Input
+		  name={name}
+		  value={data[name]}
+		  label={label}
+		  onChange={this.handleChange}
+		  error={errors[name]}
+		/>
+		)
+	  };
+	  
+	Back in the login form go back to where the input was and call {this.renderInput('username', 'Username')} and copy/repeat the same for password/Password
+	Now, I no longer need the "const { data, errors} = this.state" line in the render method of loginForm, in fact I need to move that to "form" now as well as the import for Input.
+	
+		
+	  renderInput(name, label) {
+		const { data, errors } = this.state;
+
+		return (
+		  <Input
+			name={name}
+			value={data[name]}
+			label={label}
+			onChange={this.handleChange}
+			error={errors[name]}
+		  />
+		);
+	  }
+	
+	
+3 - Obscure the text of Password as it is typed in.
+
+*** NOTE: The method below takes advantage of the HTML type parameter. A value of text displays normal text. password replaces the characters with an asterisk or dot.
+
+	To do this in the form class, renderInput method, I should add a new parameter here, I'll call it "type". Then in the Input return type={type}
+	I can give this a default value since most of the time I'd want an input of type "text" and don't want to type that every time so in the argument I'll add type = 'text', if I want to change this somewhere I can always do so.
+		  renderInput(name, label, type = "text") {
+	back in loginForm, I wont pass the type into the username renderInput as I want to rely upon the default value there.
+	For the password, I'll add a type value 'password'.
+		{this.renderInput("username", "Username")}
+        {this.renderInput("password", "Password", "password")}
+		
+	So, in the form I'm passing the type prop into the input component. Now I'll go into the component and apply the type prop dynamically.
+	In input.jsx, I've set the type to "text". Instead I should set it to: type={type} and add type as a passed prop.
+
+
+4 - One issue with the above implementation in input.jsx.
+	Every time I want to apply a new attribute to the input I have to add it to the object destructuring and explicitly set it in the return. 
+	Also, I have a pattern developing: value={value}, onChange={onChange}, name={name}, type={type}. 
+		I'll put all of the attributes that follow this pattern next to each other.
+		So in this method there are 3 parameters I specifically need. One is label, the other is name, and finally "error", Any other attributes I can pass them by using the rest operator.
+			On the top I'll keep name, label, and error, and then delete everything else. Then add ...rest to get the rest of the properties from the props object.
+				const Input = ({ name, label, error, ...rest }) => {
+		in the input field I'll delete the init of value, onChange, and type, and use the spread operator to init them.
+		
+		Now, this is exactly the same as the code I had earlier and if I want to pass an additional attribute I don't have to come back and extract the parameter, add that parameter to the destructuring list, and specifically set it.
+		**Also make sure to include the name={name} since it is specifically called out in the arguments due to its use in other parameters so it wont be caught in the rest parameter.
+		
+			const Input = ({ name, label, error, ...rest }) => {
+			  return (
+				<div className="form-group">
+				  <label htmlFor={name}>{label}</label>
+				  <input
+					{...rest}
+					autoFocus
+					name={name}
+					id={name}
+					className="form-control"
+				  />
+				  {error && <div className="alert alert-danger">{error}</div>}
+				</div>
+			  );
+			};
