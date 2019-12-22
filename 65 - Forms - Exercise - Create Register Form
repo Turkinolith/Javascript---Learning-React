@@ -1,0 +1,27 @@
+********************************
+**** Register Form Exercise ****
+********************************
+
+Build a Register form that has 3 input fields. Username, Password, and Name
+Username: Should be a valid email format, if you type something you should get the alert ("Username" must be a valid email) IE: asd@asd.com
+Password: Should be at minimum 5 characters.
+Name: A basic string
+Has a button component labeled "Register" it should be disabled until validate checks are passed.
+
+Note: this will not actually register users, this will come later. so for this just build the form and add a link to the navigation bar.
+
+*** NOTE: To get the email validation option to work I had to create my own TLD validation. apparently the web version of Joi doesn't include the IANA registry list by default to save space.
+	To fix this, I had to define my own:
+		      .email({minDomainSegments: 2,tlds: { allow: ["com", "net", "org", "edu"] }})
+	See docs here: https://joi-tester.corneroftheinternet.rocks/public/html/docs.html#stringemailoptions
+
+#1 - Make registerForm.jsx
+  This was almost the same as loginForm.jsx
+  Differences were I added an additional data to the state 'nameuser: ""', added an additional schema and adjusted other schemas to match 
+  the requirements needed.
+  (Had to do additional work for email validation, see above.)
+  Add another renderInput entry for the "nameuser","Name" field.
+
+#2 navbar.jsx added an entry to the register page as a NavLink.
+
+#3 in App.js add a Route path for RegisterForm and import it 
