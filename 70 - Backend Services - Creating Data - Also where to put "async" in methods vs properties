@@ -1,0 +1,60 @@
+****************************************************************************
+**** Creating Data - Also where to put "async" in methods vs properties ****
+****************************************************************************
+
+In the http-app there is an add button for creating a new post. In a real app we'd have a form somewhere, the user fills out that form, clicks the create button,
+and we would create an object and send that object to the back-end for persistence.
+So, on the back-end we'd get the object and store it in a DB.
+
+Let's simulate this scenario.
+
+In App.js there is the event handler "handleAdd" Within this create a new object "const obj = { }" 
+As I saw, the posts have at least 2 properties: title and body. So I'll set them to arbitrary values:
+	handleAdd = () => { const obj = { title: 'a', body: 'b' }; };
+
+Now, I want to send this to the server. So once again I'll use Axios for that but instead of using the "get" method I'll use "post"
+	****NOTE: Use "get" for getting data. use "post" for creating data.
+	axios.post()
+		The first argument is the URL of an endpoint. I'll use the exact same URL as before. To avoid repetition, I'll save it in a constant named apiEndpoint.
+	Back down in the componentDidMount I'll replace the URL location with the new constant: apiEndpoint
+	And similarly I'll do the same for the new post in handleAdd. 
+
+Because I'm creating data with the post method, I need to include the data in the body of the request. So I need to send that object to the server. So I pass that as the 2nd argument
+to the method. 
+	axios.post(apiEndpoint, obj);
+
+As with get, this method returns a promise. so I need to store it in a variable and await it to get a response. 
+Also, just like before, I'll use object destructuring to pick the data property and rename it to post. Because in this case when I send the HTTP request to
+create a new post, the server or backend will respond with the newly created post. not the entire list of posts.
+	const { data: post } = await axios.post(apiEndpoint, obj);
+	
+And again, because I used the "await" keyword I should declarate the function with the async keyword.
+
+	handleAdd = async () => {
+	  const obj = {title: 'a', body: 'b' );
+	  const { data: post } = await axios.post(apiEndpoint, obj);
+	};
+
+*NOTE: here we have 2 different syntax's. 
+	async componentDidMount() - Is a method in this class, that is why the async goes in the front.
+	handleAdd = async () => { - Is basically a property we are setting to a function, so that is why we apply async where it is there.
+	
+console.log(post) and save changes.
+
+
+In the app when I click [Add] clg reports the following:
+Object { title: "a", body: "b", id: 101 }
+
+It has the properties we sent to the server, Title and Body, but it also has an "id" which is the ID of the newly created post.
+	note: if you click add a bunch of times you'll sometimes get ID# of 101 or 102. It's not reliable, because this is a fake service so it doesn't return a unique
+	identifier every time you create a post.
+
+So, now I need to add this to the table. This is something I've done before.
+	const posts = [post, ...this.state.posts];
+	this.setState({ posts });
+	
+When I click the [Add] button now, I get the new entry in the list!
+	
+	*Note: if I click add multiple times and look in console I get the warning: [Warning: Encountered two children with the same key, `101`. Keys should be unique so that...]
+	This is, again, because this is a fake service and its not generating unique keys. Ignore this warning for this app. in a real app with a proper backend you should
+	not get this warning.
