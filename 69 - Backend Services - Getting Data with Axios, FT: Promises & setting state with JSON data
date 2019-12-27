@@ -1,0 +1,91 @@
+
+******************************************************************************
+**** Getting Data with Axios, FT: Promises & setting state with JSON data ****
+******************************************************************************
+I installed Axios (v0.19) and now I'll be using it with the very basic http-app project to get the list of posts from our fake back-end using the JSON placeholder page.
+
+Open up the http-app project folder and open App.js
+
+#1 - Import axios into the project.
+	import axios from "axios"
+
+
+#2 - ** NOTE: As mentioned earlier in the course, the right place to call the server and get data is from the "componentDidMount" lifecycle Hook.
+So, in the class add the hook (cdm is the shorthand to start it up with my mods)
+	componentDidMount() {}
+	
+#3 - To call axios add within the block axios.get() to send an HTTP request and get data.
+	The first argument is the URL. What is the URL? That is the URL of the endpoint (in this case: https://jsonplaceholder.typicode.com/posts)
+		axios.get('https://jsonplaceholder.typicode.com/posts');
+		
+#4 - The axios get returns a promise, so it needs to be stored somewhere:
+	const promise = axios.get('https://jsonplaceholder.typicode.com/posts');
+	
+** What is a Promise?
+	It is an object that holds the result of an asynchronous operation. An async operation is an operation that will complete sometime in the future.
+	When an HTTP request is sent, there will be a delay until we get the result. So, the promise object promises to hold the result of that async operation.
+	
+	Promise states:
+		When a promise is created, initially it is within the "pending" state.
+		When the operation completes that state will either change to "resolved" (success), OR rejected (failure)
+	
+	Lets look at one in the console:
+		console.log(promise);
+		
+	*From Firefox:
+		Promise { "fulfilled" }
+		<state>: "fulfilled
+		<value>: {…}
+		config: Object { url: "https://jsonplaceholder.typicode.com/posts", method: "get", timeout: 0, … }
+		data: Array(100) [ {…}, {…}, {…}, … ]
+		headers: Object { "cache-control": "max-age=14400", "content-type": "application/json; charset=utf-8", expires: "-1", … }
+		request: XMLHttpRequest { readyState: 4, timeout: 0, withCredentials: false, … }
+		status: 200
+		statusText: "OK"
+		<prototype>: Object { … }
+		<prototype>: PromiseProto { … }
+
+	Promise { "fulfilled" } and [[PromiseStatus]]: "resolved" in Chrome, mean they have resolved successfully.
+	The chrome square brackets around PromiseStatus means that it represents an internal property. This means it does NOT have a property called PromiseStatus that can be accessed with dot notation.
+	Similarly in chrome, there is a [[PromiseValue]], you can't access that with dot notation. This is the object you get from the async operation. 
+	In this case, it is the response from the server.
+	
+	The response object has a few properties: 
+		data: this is an array with 100 posts from JSON placeholder.
+		headers: these are the HTTP headers the server sends to the client. 
+		request: the original request
+		status: '200', this indicates success.
+	
+#5 - How to get the response from my promise?
+	 The promise object has a method called promise.then() With the method we can get the result, but this is the old way of doing things.
+	 In modern JS we have a keyword called "await"
+	 So, I can await the promise and get the result like this:
+		const response = await promise;
+		**NOTE**: whenever you use the "await" keyword within a function, you should declarate the function with the "async" keyword.
+			async componentDidMount() {
+				const promise = axios.get("https://jsonplaceholder.typicode.com/posts");
+				const response = await promise;
+			}
+	Now, lets log the response on console: console.log(response).
+	Now I have the response saved.
+	
+#6 - There is a cleaner way to write the code.
+	You don't really need the promise constant, you can simply await the result of the axios.get call and get the response object and store it:
+		async componentDidMount() {
+			const response = await axios.get("https://jsonplaceholder.typicode.com/posts");
+			console.log(response);
+		}
+		
+#7 - I now have the response. The response has the property "data" which is the posts we get from the server.
+	So, I can use object destructuring on the variable to extract just the part I need, rename it to "posts", and set it to the component state.
+
+	async componentDidMount() {
+      const { data: posts } = await axios.get(
+      "https://jsonplaceholder.typicode.com/posts"
+	  );
+	  this.setState({ posts });
+	}
+
+Save and look back at browser, now the table is populated with the placeholder posts!
+
+
