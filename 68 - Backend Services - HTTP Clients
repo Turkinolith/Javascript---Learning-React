@@ -1,0 +1,13 @@
+**********************
+**** HTTP Clients ****
+**********************
+
+In react I need to send HTTP requests to a back-end to get and save data.
+How to do that?
+As noted in the start of the course, React is for building user interfaces, not client communications.
+So, you would have to use a library you prefer to do this, unlike a framework like Angular which has ONLY HttpModule.
+
+So what are the options?
+[Fetch API] - Most modern browsers have the ability to send native requests using Fetch API.
+[jQuery AJAX] - Older and very common.
+[Axios] - Another very popular library and the one I'll be using.
