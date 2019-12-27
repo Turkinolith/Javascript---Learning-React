@@ -1,0 +1,134 @@
+
+************************************
+**** Exercise: Add Movie Search ****
+************************************
+
+
+Add a search box that lives below the "Showing # movies in the database." span.
+Search box should search for movies by their title. IE: "the" should return "The Avengers" and "The Sixth Sense" 
+Search should be case-insensitive.
+If you select a genre filter, then type into the search option, the genre filter should auto clear to no filters selected.
+Similarly, if you have a search query and select a genre filter, the search should be cleared.
+
+For my solution I took concepts from a stack overflow answer on the subject:
+
+The simplest to implement is to filter the props in your render method. If you have sufficiently small components which don't update for too many reasons, and especially if the number of elements in the list is low, this might be the preferred method:
+
+```
+class FilterList extends React.Component {
+  render () {
+    const { elements } = this.props;
+    const { filterStr } = this.state;
+
+    const filteredElements = elements
+      .filter(e => e.includes(filterStr))
+      .map(e => <li>{ e }</li>)
+
+    return (
+      <div>
+        <input
+          type="text"
+          value={ filterStr }
+          onChange={ e => this.setState({ filterStr: e.target.value }) } />
+        <ul>
+          { filteredElements }
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+
+In my code I added a new state property called filterStr and inited it to an empty string.
+in "handleGenreSelect" I added filterStr: "" into it so as to make it clear the value of the filter when the user selects a genre.
+
+in the "getPagedData" method is where I did the bulk of my work with it as such:
+
+ getPagedData = () => {
+    const {
+      pageSize,
+      currentPage,
+      sortColumn,
+      selectedGenre,
+      filterStr,
+      movies: allMovies
+    } = this.state;
+
+    //Added disabling of Genre filter if user inputs a search character
+    const filtered =
+      selectedGenre && selectedGenre._id && !filterStr
+        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
+        : allMovies;
+
+    const filteredElements = filterStr
+      ? filtered.filter(e => e.title.toLowerCase().includes(filterStr))
+      : filtered;
+
+    //console.log( "Filtered Elements: ", filterStr  ? filtered.filter(e => e.title.toLowerCase().includes(filterStr)) : filtered);
+
+    const sorted = _.orderBy(
+      filteredElements,
+      [sortColumn.path],
+      [sortColumn.order]
+    );
+
+    const movies = paginate(sorted, currentPage, pageSize);
+
+    return { totalCount: filteredElements.length, data: movies };
+  };
+ 
+ Finally, in my render method I added the field in as an <input>
+ 
+   render() {
+    const { length: count } = this.state.movies;
+    const { pageSize, currentPage, sortColumn, filterStr } = this.state;
+
+    if (count === 0) return <p>There are no movies in the database.</p>;
+
+    const { totalCount, data: movies } = this.getPagedData();
+
+    return (
+      <div className="row">
+        <div className="col-3">
+          <ListGroup
+            items={this.state.genres}
+            selectedItem={this.state.selectedGenre}
+            onItemSelect={this.handleGenreSelect}
+            strFilter={filterStr}
+          />
+        </div>
+        <div className="col">
+          <Link className="btn btn-primary" to="/movies/new">
+            New Movie
+          </Link>
+          <p>Showing {totalCount} movies in the database.</p>
+          <input
+            type="text"
+            value={filterStr}
+            placeholder="Search..."
+            onChange={e => {
+              this.handleFiltering(e.target.value);
+              this.setState({ filterStr: e.target.value });
+            }}
+          />
+          <MoviesTable
+            movies={movies}
+            sortColumn={sortColumn}
+            onLike={this.handleLike}
+            onDelete={this.handleDelete}
+            onSort={this.handleSort}
+          />
+          <Pagination
+            itemsCount={totalCount}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={this.handlePageChange}
+          />
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Movies;
