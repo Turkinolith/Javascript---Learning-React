@@ -1,0 +1,11 @@
+
+********************************************
+**** Backend Services: JSON Placeholder ****
+********************************************
+
+https://jsonplaceholder.typicode.com/ <- Website that allows public endpoints for testing to create, read, update, and delete data. These are called: CRUD Operations.
+
+
+REST API: Representational State Transfer Application Programming Interface
+
+For color coding and proper formatting of JSON data in the browser: JSON View add-on.
