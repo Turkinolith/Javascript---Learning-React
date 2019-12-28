@@ -1,0 +1,29 @@
+********************************
+**** Lifecycle of a Request ****
+********************************
+To view the lifecycle of a request in action:
+open dev tools and go to the network tab. Clear anything that may already be there.
+Go back to the http-app and click "add"
+Back on the network tab you can see 2 requests: one with status 204, the other with 201.
+
+	204 -
+		On the headers tab you can see the request URL is set to the posts endpoint of jsonplaceholder.  
+		Request method is set to OPTIONS. 
+			What is Request Method? Every http request has a property called method that determines the intent of the request. 
+			Common methods are: 
+				GET - For Getting Data.
+				POST - For creating data.
+				PUT - For updating data.
+				Delete - for deleting data.
+			Here, we have an OPTIONS request. The reason we have this request here is because this app is hosted at localhost but the backend is hosted somewhere else. https://jsonplaceholder.typicode.com in this case.
+			These are two seperate domains. So, for security reasons whenever an application sends an AJAX request to a different domain the browser always sends an OPTIONS request.
+			That is why we have the OPTIONS request first. 
+	
+	201 -
+		This request is again going to https://jsonplaceholder.typicode.com/posts, the request method this time is POST, used for creating data.
+		Status Code is 201, this means a resource was created.
+			If you scroll down in chrome (or switch to the Params tab in Firefox) you can see the "Request Payload" which has the object we sent to the server, which is an object with title and body properties.
+			If we look at the response tab (in both chrome and firefox) you'll see the "Response Payload" that jsonplaceholder returned with title, body, and id properties.
+			Axios wrapps that object in a response object that has a data property that we picked using object destructuring syntax. 
+				That same response object has other properties that can be used to read the status of the response, the headers, and so on.
+		
