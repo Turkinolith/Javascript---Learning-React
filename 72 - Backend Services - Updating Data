@@ -1,0 +1,72 @@
+***********************
+**** Updating Data ****
+***********************
+
+For this I'll look at the handleUpdate hook in app.js of the http-app project.
+In it I get a post object, so lets do something like change the title of the post:
+ handleUpdate = post => {
+    post.title = "UPDATED";
+  };
+So, I've modified the object in memory, now I need to send the object to the server for persistence.
+I use axios for this, but I have 2 methods for updating data.
+
+#1 - axios.put() - used to update "ALL" properties.
+#2 - axios.patch() - used to update 1 or more properties.
+
+** Using Put and Patch **
+	begins with a URL like axios.post, but this is a bit different. Since you are updating a piece of specific data you need to include the ID for the thing you are updating in the URL.
+	contrast with axios.post where we simply passed the variable "apiEndpoint" which stood for https://jsonplaceholder.typicode.com/posts
+	To do this just concat the strings:
+		axios.put(apiEndpoint + '/' + post.id)
+			*A better way to rewrite this would be with template literals in ES6.
+	For the 2nd argument, I need to pass the data that will be sent to the server.
+	When using the "put" method, I should send the "entire" post object. If I was using patch I'd just send the properties that are being updated.
+		axios.put(`${apiEndpoint}/${post.id}`, post);
+	
+	Alternatively, here is what the same thing would look like using axios.patch(), instead of sending the whole post object, I'd send an object that only has the properties that I'll be updating.
+		axios.patch(`${apiEndpoint}/${post.id}`, { title: post.title });
+	
+	Again, since these return promises I need to prefix them with "await"
+		await axios.put(`${apiEndpoint}/${post.id}`, post);
+		
+	And apply the async keyword in the function (again, this is a property set to a function, so apply it after the =.
+		  handleUpdate = async post => {
+			post.title = "UPDATED";
+			await axios.put(`${apiEndpoint}/${post.id}`, post);
+		  };
+	
+	After getting the response can destructure it to get the data:
+		  handleUpdate = async post => {
+			post.title = "UPDATED";
+			const { data } = await axios.put(`${apiEndpoint}/${post.id}`, post);
+		  };
+		  
+	Then, log it on the console:
+		  handleUpdate = async post => {
+			post.title = "UPDATED";
+			const { data } = await axios.put(`${apiEndpoint}/${post.id}`, post);
+			console.log(data);
+		  };
+		  
+	I tested this by clicking a random entry (#8 in this case) and clicked "Update". The function returns:
+	
+		body: "dignissimos aperiam dolorem qui eum\nfacilis quibusdam animi sint suscipit qui sint possimus cum\nquaerat magni maiores excepturi\nipsam ut commodi dolor voluptatum modi aut vitae"
+		id: 8
+		title: "UPDATED"
+		userId: 1
+	
+	In order to update an object or more accurately a resource I send an HTTP request to a given endpoint and that endpoint we have the ID of the resource and the object I put in the body of the request.
+	And the server then returns that object or resource in the body of the response. 
+	
+	In this example I'm not going to use the whole data object so to simplify the code I'll delete the data constant.
+	Now that I've sent the update to the server now I need to update the UI:
+		Like before, clone the posts array, create a new array and spread this.state.posts. This makes the local copy of the state.
+			const posts = [...this.state.posts];
+		Next I need to find the index of the posts in the array in the local state.
+			const index = posts.indexOf(post);
+		Next go to the index, create a new object, and spread the post argument. This is setting the values of the state copy at the correct index to match the passed in data that we're updating.
+			posts[index] = {...post};
+		finally set the state with the updated data.
+			this.setState({ posts });
+			
+	Now, back in the app. as I click each entry and get responses from the server the title of the post refreshes to "UPDATED"
