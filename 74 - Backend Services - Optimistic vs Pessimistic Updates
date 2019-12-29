@@ -1,0 +1,67 @@
+
+*******************************************
+**** Optimistic vs Pessimistic Updates ****
+*******************************************
+I've implemented all the CRUD operations, but there is an issue. When I click the delete button it takes about a second before it is removed from the table, it wasn't immediate.
+That same issue exists when updating and adding a post. It takes a moment for the data to make a full round-trip.
+
+Why? because in the current implementation I'm calling the server first THEN updating the UI.
+With this implementation if an error occurs while calling the server the rest of the function will not execute.
+
+**Waiting for the async function to complete before continuing the rest of the function is called "PESSIMISTIC UPDATE"
+	We are not sure if the call to the server is going to succeed or fail.
+	
+**Assuming that the async function will succeed and continuing the function as expected is called "OPTIMISTIC UPDATE"
+	An example of this will be updating the UI FIRST, Then calling the server to perform whatever action as desired.
+	*If this call fails, I can revert the UI back to its previous state.
+	
+
+*Optimistic Update with the handleDelete method:
+	Move the UI update portions of the method to the top
+		  handleDelete = async post => {
+			const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+			this.setState({ posts });
+			await axios.delete(`${apiEndpoint}/${post.id}`);
+		  };
+	Back in the app after saving this, I can hit delete several times in a row and the UI instantly updates. The server round-trip still takes a while, but it gives the user the illusion of a snappy application.
+	
+	So, what happens if something goes wrong? I need to undo the most recent change.
+	Add a new variable to the top of the function where I will store the state at time of call.
+				  handleDelete = async post => {
+					const originalPosts = this.state.posts;
+					
+					const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+					this.setState({ posts });
+					await axios.delete(`${apiEndpoint}/${post.id}`);
+				  };
+	Now, if the promise fails, I'll call setState on originalPosts and it'll easily revert the UI back to the prior state.
+	In order to detect errors I need to wrap the promise within a try/catch block.
+	
+	  handleDelete = async post => {
+		const originalPosts = this.state.posts;
+		const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+		this.setState({ posts });
+		try {
+		await axios.delete(`${apiEndpoint}/${post.id}`);
+		}
+		catch (exception) {
+		  alert('Something failed while deleting a post!');
+		  this.setState({ posts: originalPosts });
+		}
+	  };
+	  
+***NOTE:
+	To simulate an error without actually having one, just manually throw an error like this.
+		  handleDelete = async post => {
+			const originalPosts = this.state.posts;
+			const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+			this.setState({ posts });
+			try {
+			  await axios.delete(`${apiEndpoint}/${post.id}`);
+			  throw new Error("");
+			} catch (exception) {
+			  alert("Something failed while deleting a post!");
+			  this.setState({ posts: originalPosts });
+			}
+		  };
+	Then, after clicking delete, the UI will update for a moment, then the alert pops up. When you click "OK" on the alert the state reverts.
