@@ -1,0 +1,21 @@
+***********************
+**** Deleting Data ****
+***********************
+Finally lets look at deleting data.
+Once again call axios:
+	handleDelete = post => {
+		axios.delete()
+	};
+	
+The URL is exactly the same as for updating data.
+	handleDelete = async post => {
+		await axios.delete(`${apiEndpoint}/${post.id}`);
+	};
+When deleting data, we don't need to include anything in the body of the request, we just need the URL that identifies the resource.
+At this point the resource should be deleted from the server, so now we just need to update the UI.
+
+	handleDelete = async post => {
+		await axios.delete(`${apiEndpoint}/${post.id}`);
+		const posts = this.state.posts.filter(p => p.id !== post.id);  // This will return all posts except for the one we are deleting.
+		this.setState({ posts });
+	};
