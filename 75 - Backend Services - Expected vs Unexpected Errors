@@ -1,0 +1,70 @@
+
+***************************************
+**** Expected vs Unexpected Errors ****
+***************************************
+
+Expected: errors that the API endpoint predict and return. IE: if you delete a post with an invalid ID server returns (404: not found), if you submit a form with invalid data (400: bad request) 
+	Errors in the 400 block are also known as - CLIENT ERRORS - The client did something wrong.
+	When getting these I should display a specific error message to the user.
+		IE: if the user gets a 404 error when deleting the post, I should tell the user something to the effect of "This post is already deleted!" or "This post could not be found!" something specific.
+		In the case of a 400 error, tell the user what fields in the form were invalid.
+	
+Unexpected: errors that technically should not happen under normal circumstances.
+	IE: if the network is down you can't contact the server. Or the network works but the server is down, or the server is up but the database is down. Or there is a bug in the app code.
+	These should be handled differently.
+	1st - Log them, so you can find the errors and investigate.
+	2nd - Display a generic and friendly error message.
+	
+	** ERROR HANDLING IMPLEMENTATION **
+	Now, lets implement handling expected and unexpected errors in the http app.
+		In the handleDelete method, how to check if the exception in the catch block is an expected or unexpected error?
+		Well, the exception object has 2 properties: request and response
+			IE: } catch (exception) {
+				exception.request
+				exception.response
+		Response is set if it successfully gets a response from the server. If the network is down we won't get a response and this property will be null.
+		Request will be set if we successfully submit a request to the server. Otherwise, it'll be null.
+	
+	** Check for a specific error type: **
+		In this case, we have one expected error: status code 404. To check for this error I need to write code like this:
+			If exception.response is truthy and its status === 404 
+				if (exception.response && exception.response.status === 404)
+					alert('This post has already been deleted.');
+			In the case of having this in the "handleDelete" method, this is the only expected error.
+			So I can treat anything else as an unexpected error.
+			else log the error (in this case log it to console, later I'll go and do it properly) 
+			then add a generic alert.
+			
+			try {
+			  await axios.delete(`${apiEndpoint}/${post.id}`);
+			} catch (exception) {
+			  if (exception.response && exception.response.status === 404)
+				alert('This post has already been deleted.');
+			  else {
+				console.log('logging the error', exception);
+				alert('An unexpected error occurred.');
+			  }
+
+		Regardless of the type of error, I should revert the UI to the previous state.
+		
+		To simulate an expected error add an invalid post by changing the delete path:   await axios.delete(`${apiEndpoint}/`);
+
+Final Code for handleDelete:
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+    const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+    this.setState({ posts });
+    try {
+      await axios.delete(`${apiEndpoint}/${post.id}`);
+    } catch (exception) {
+      if (exception.response && exception.response.status === 404)
+        alert("This post has already been deleted.");
+      else {
+        console.log("logging the error", exception);
+        alert("An unexpected error occurred.");
+      }
+
+      this.setState({ posts: originalPosts });
+    }
+  };
