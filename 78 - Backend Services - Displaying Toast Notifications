@@ -1,0 +1,17 @@
+****************************************
+**** Displaying Toast Notifications ****
+****************************************
+Aka - slide panel notifications.
+
+1- install react-toastify: npm i react-toastify
+
+in app.js import import { ToastContainer, toast } from "react-toastify";
+
+2- also  import "react-toastify/dist/ReactToastify.css";
+
+3- in httpService.js import { toast } from "react-toastify";
+	toast is a function, but can also be used like an object and can directly replace the "alert" functions used for errors.
+	IE: you can call toast("text") 
+	or you can call toast.error("error text")
+	there is also toast.success() and toast.info()
+	it just changes the presentation of the toast
