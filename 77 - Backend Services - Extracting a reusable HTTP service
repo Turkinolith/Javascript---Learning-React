@@ -1,0 +1,64 @@
+********************************************
+**** Extracting a reusable HTTP service ****
+********************************************
+With use of the interceptor I've improved the error handling of the application.
+However, the implementation is not ideal.
+In implementing it this way I've polluted the app module. So at the beginning of the module I have all of this detail about intercepting errors, checking if it is unexpected, blah blah.
+
+all of these details have polluted the app module which should be the root of the application.
+The other issue is if tomorrow when I make another app I need to go copy/paste the interceptor code into the new app. It's not portable.
+Would be nicer if I had another module, like "HTTP Service Module" and all of this code was in that module. Then the app module wouldn't be polluted with details and I could simply copy that file into my 
+next app.
+
+*** Making a new module ***
+1- I'll make a new folder within src, services.
+2- make a new file within it: httpService.js
+3- Back in app module, cut the whole interceptor function out. and paste it in the new file.
+4- on the top of the httpService file import Axios.
+5- on the bottom of the httpService, export a default object
+	This object should have 4 methods:
+		Get
+		Post
+		Put
+		Delete
+	Just like the axios object.
+Code:
+	export default {
+	get: axios.get,
+	post: axios.post,
+	put: axios.put,
+	delete: axios.delete
+	};
+
+6- Back in the app module, import httpService from './services/httpService';
+Now, anywhere in app.js where axios is called out, I can simply replace them with "httpService"
+
+There is no longer any reference to axios in the app.js module at this point. I've hidden it behind the httpService module. 
+So, if I decide at any point to change to a different library, there is only a single location where I need to make the change. (the HttpModule)
+
+As long as the HttpModule exports the get, post, put, and delete methods the rest of the app will not be affected. In the app module it doesn't care what module I use to send http requests. 
+So, that is one of the benefits from introducing the http service module.
+And, in the next project I can simply copy the whole module into a new project.
+
+Final code for httpService.js:
+import axios from "axios";
+
+axios.interceptors.response.use(null, error => {
+  const expectedError =
+    error.response &&
+    error.response.status >= 400 &&
+    error.response.status < 500;
+
+  if (!expectedError) {
+    console.log("logging the error", error);
+    alert("An unexpected error occurred.");
+  }
+  return Promise.reject(error);
+});
+
+export default {
+  get: axios.get,
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete
+};
