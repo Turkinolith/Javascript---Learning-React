@@ -1,0 +1,104 @@
+
+******************************************************************
+**** Handling Unexpected Errors Globally - Axios Interceptors ****
+******************************************************************
+
+Currently I've only handled expected and unexpected error handling in the handleDelete method.
+I need to also add this for handleUpdate, handleAdd, and getting all the posts from the server.
+So if I get an error I need to log it and display a friendly message to the user.
+I don't want to repeat those two steps everywhere.
+This is when I use an interceptor in Axios.
+I can intercept the requests and responses and if I have a response with an unexpected error I can handle it in a single location.
+
+after the import statements:
+axios.interceptors. <- At this point there are 2 properties: I can intercept all requests going out, or intercept all responses coming in. I'll go with responses.
+axios.interceptors.response.use() The use method takes 2 parameters, both are functions that will be called. The first if the response is successful and the 2nd if it has an error. ((A use case of the success is if you want to log it for auditing.))
+In this case I don't need the success, so I'll pass null. the error one I'll pass an arrow function that will be triggered any time there is an error.
+	Example: axios.interceptors.response.use(null, error => { console.log('INTERCEPTOR CALLED'); }
+	To pass control to the catch block, I need to return a rejected promise:
+		axios.interceptors.response.use(null, error => { console.log('INTERCEPTOR CALLED'); return Promise.reject(error);});
+	
+	In this implementation, whenever there is a response with an error the above function will be called first, then the control will be passed to the catch block below. 
+	Verified this works using delete.
+	
+	Now, I'll move the log the error CLG line and the "unexpected error occurred" lines into the interceptor call and get rid of the "else" block in the handleDelete function.
+	
+axios.interceptors.response.use(null, error => {
+  console.log("logging the error", exception);
+
+  alert("An unexpected error occurred.");
+  
+  return Promise.reject(error);
+});
+
+So now it will log the error, display the alert, and return the rejected promise.
+
+
+**** How to filter axios.interceptors if the error is unexpected vs expected ****
+
+Now, I want to only execute the first 2 steps if the error is unexpected. So if I have an expected error I just want to return the rejected promise.
+if error.response is truthy and error.response.status is greater than or equall to 400 and status code is less than 500. (IE: if its in the 400 range its an expected error.)
+Code:
+	if (error.response && error.response.status >=400 && error.response.status < 500) {
+	  return Promise.reject(error);
+	}
+		
+I can also extract the expression in the if statement as a constant:
+
+	axios.interceptors.response.use(null, error => {
+		const expectedError = error.response && error.response.status >=400 && error.response.status < 500;
+		
+		if (expectedError) {
+		  return Promise.reject(error);
+		}
+	});
+	
+Also can reverse the condition for Unexpected errors:
+
+	axios.interceptors.response.use(null, error => {
+		const expectedError = error.response && error.response.status >=400 && error.response.status < 500;
+		
+		if (!expectedError) {
+			console.log("logging the error", error);
+			alert("An unexpected error occurred.");
+		}
+	return Promise.reject(error);
+	});
+
+
+Either way, I'll return a rejected promise. (but have the unexpected error logging handled in the above one.)
+
+Now, I can leave the handling of unexpected errors to the Interceptor and only concern myself with expected errors (such as error.response.status === 404)
+
+
+Code: 
+
+
+axios.interceptors.response.use(null, error => {
+  const expectedError =
+    error.response &&
+    error.response.status >= 400 &&
+    error.response.status < 500;
+
+  if (!expectedError) {
+    console.log("logging the error", error);
+    alert("An unexpected error occurred.");
+  }
+  return Promise.reject(error);
+});
+
+// ...
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+    const posts = this.state.posts.filter(p => p.id !== post.id); // This will return all posts except for the one we are deleting.
+    this.setState({ posts });
+    try {
+      await axios.delete(`${apiEndpoint}/${post.id}`);
+    } catch (exception) {
+      if (exception.response && exception.response.status === 404)
+        alert("This post has already been deleted.");
+
+      this.setState({ posts: originalPosts });
+    }
+  };
