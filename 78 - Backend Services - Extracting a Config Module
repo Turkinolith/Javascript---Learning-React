@@ -1,0 +1,27 @@
+
+************************************
+**** Extracting a Config Module ****
+************************************
+
+The other thing that can be improved in app.js is to take out the apiEndpoint constant. 
+Chances are I'll use that endpoint in several places in the application so I don't want to hard-code it on top of app module.
+Lets move it into a configuration file.
+
+1- In source folder, add a new file. config.json
+2- add an empty JSON object and add a key called "apiEndpoint" and set it to the URL string.
+	Here I could have several other config parameters currently only have the API endpoint.
+3- Now, remove the constant line from app.js.
+4- import config from './config.json';
+5- Now, anywhere in the code that references apiEndpoint, I can prefix them with config.apiEndpoint
+	IE:   
+	*OLD*
+	async componentDidMount() {
+    const { data: posts } = await httpService.get(apiEndpoint);
+    this.setState({ posts });
+  }
+  
+	*NEW*
+	  async componentDidMount() {
+    const { data: posts } = await httpService.get(config.apiEndpoint);
+    this.setState({ posts });
+  }
