@@ -1,0 +1,12 @@
+***********************
+**** Vidly Backend ****
+***********************
+So far this movie doesn't have a backend. All the info is in memory.
+If I refresh the page any changes I made are gone. So from here on I'll work to add a backend to it using a pre-built backend. (Its covered more in depth in the Node.js course)
+The backend will consist of Node, Express, and MongoDB.
+
+**INSTALLING MONGO DB
+
+Mac instructions: https://codewithmosh.com/courses/357787/lectures/5867618
+
+Windows instructions: https://codewithmosh.com/courses/357787/lectures/5867617
