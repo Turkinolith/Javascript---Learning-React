@@ -1,0 +1,58 @@
+*************************************
+**** Extracting a Logger Service ****
+*************************************
+The init of Sentry in index.js is polluting the file. 
+index.js is a high level module and is responsible for bootstrapping the app. Its a manager, responsible for delegating tasks. Details of the tasks should not be here.
+
+Also the current implementation makes it hard to replace Sentry with anything else because if I decide to go with any other service I'll have to comb through the code to find any instance of it being used and modify it.
+Chances are that if I use another service they may not have an API function called "captureException" with different parameters so I'll have to refactor all of that as well on top of digging through the code to find it.
+
+To solve this, I need to extract all the Sentry logic and put it in a separate module. Also if I decide to replace it there is only a single location I need to modify.
+
+#1 - In services add a new file "logService.js"
+
+#2 - add 2 functions: 
+	init() and log(error)
+	
+#3 - Now, to get the implementation of these functions I'll go to the other modules.
+	index.js I'll cut the Sentry.init lines and put them in the init function.
+
+#4 - Obviously, I'll need to import Sentry here now.
+
+#5 - Now to implement the log function:
+	Go back to httpService and copy the captureException line, its how I log using Sentry, and put it in the log function.
+
+#6 - Finally, I need to export a default object with two paramters, init and log:
+	export default {
+	  init, 
+	  log
+	};
+	
+	So, this is the interface of the loginService. It has 2 methods, init and log. 
+
+#7 - In index.js I need to import the logService module. 
+	Then, I call "logService.init();" before the React render call.
+	Now, there is no more link to Sentry there.
+
+#8 - in httpService, import the logService there, overwriting the Sentry import.
+	Where I had the sentry call replace it with:
+		logService.log(error);
+		
+Final Code for the logService.js:
+
+import * as Sentry from "@sentry/browser";
+
+function init() {
+  Sentry.init({
+    dsn: "USER KEY HERE"
+  });
+}
+
+function log(error) {
+  Sentry.captureException(error);
+}
+
+export default {
+  init,
+  log
+};
