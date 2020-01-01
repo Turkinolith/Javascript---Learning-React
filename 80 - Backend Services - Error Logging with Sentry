@@ -1,0 +1,40 @@
+***************************************
+**** Logging Errors with Sentry.io ****
+***************************************
+
+in the HttpModule, if I have an unexpected error currently I'm logging it on the console.
+This is fine on a dev machine but when deployed to production this isn't helpful because the console would be on the end-user's browser and I wouldn't have access to that.
+So, to make it useful I need to store that error somewhere that I can access. 
+This is where I use a "Logging as a service" provider.
+
+There are many of these providers, one is "Sentry.io"
+I created a Sentry log-in, however the instructors directions began to diverge from the ones on their website, so I'll use their website instructions from here on out:
+
+#1 - I create a project and select the type of project I'm using, in this case React. I'll call the project something like "HttpApp"
+#2 - it now wants me to install their SDK into the project.
+		'npm install @sentry/browser'
+		
+#3 - Connecting the SDK to Sentry:
+	After you’ve completed setting up a project in Sentry, Sentry will give you a value which we call a DSN or Data Source Name. It looks a lot like a standard URL, but it’s just a representation of the configuration required by the Sentry SDKs. It consists of a few pieces, including the protocol, public key, the server address, and the project identifier.
+
+	You should init the Sentry browser SDK as soon as possible during your application load up, before initializing React:
+
+		import React from 'react';
+		import ReactDOM from 'react-dom';
+		import * as Sentry from '@sentry/browser';
+		import App from 'src/App';
+
+		Sentry.init({dsn: "DSN KEY HERE"});
+
+		ReactDOM.render(<App />, document.getElementById('root'));
+		
+#4 - In httpService import Sentry:
+	import * as Sentry from "@sentry/browser";
+	
+	Then replace the console.log("logging the error", error);
+	with: 
+		Sentry.captureException(error);
+		
+And that is it!
+I generated some intentional errors to test things out. The breadcrumbs feature is really nice since it shows you what happened immediately up till the exception.
+
