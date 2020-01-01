@@ -1,0 +1,13 @@
+****************************
+**** Installing MongoDB ****
+****************************
+I installed MongoDB on local, I did *NOT* install it as a service as I don't want it running all the time on my home machine.
+
+In so doing I needed to add the path to it in windows advanced settings as per https://codewithmosh.com/courses/357787/lectures/5867617
+
+I also needed to create the folder: C:\data\db as mongodb looks for that.
+
+I opened up MongoDB Compass (the mongo DB admin tool) and verified that I had 3 DB's
+admin, config, local
+
+Looks like set up was successful.
