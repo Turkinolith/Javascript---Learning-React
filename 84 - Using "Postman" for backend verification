@@ -1,0 +1,34 @@
+****************************************************
+**** Disabling Authentication in Vidly-API-Node ****
+****************************************************
+Before modifying the app to the node backend, first I'll make sure that I can create a movie by sending an HTTP request to the movies end point.
+To do this, I'll use the app "Postman"
+This app lets me send a bunch of different HTTP requests and see the responses.
+
+Open a new tab in postman and in the request URL point it towards http://localhost:3900/api/movies
+*Note, on the left side of the bar where it says "GET" you can change it to other access types. leave it GET for now and hit send
+You'll get a bunch of data below, this is the DB response.
+
+Lets see if we can create data:
+Change the type to "POST" and click on the body tab, there select the "raw" radio button and change the type to "JSON"
+In the box add a new object. then fill out the data as if we were submitting a raw JSON object.
+**NOTE: make sure to put the keys in double quotes as that is the only correct way to do so in the JSON format.
+	{
+	"title": "A new movie from postman",
+	"numberInStock": 1,
+	"dailyRentalRate": 2,
+	"genreId": "5e0c34fb1408cc5d0ce93655"
+	}
+
+When hit "send" I'll get an error: 
+404 Unauthorized
+Access denied. No token provided.
+
+I'll do authorization in the next section, so for now to make sure the app works with the backend I'll temporarily disable authentication using a configuration setting.
+This is purely for this course so I don't get caught up in the details of authentication. It's not something I should do in a production environment.
+
+1- In terminal stop the web server by ctrl+C 
+2- Open project in VS Code and go to the config folder, opening the file "default.json"
+3- There is a bool key "requiresAuth" just set to false.
+4- Back in terminal node index.js again and go back to postman and try sending the post again.
+5- This time got back a response with status "200 OK" and the data that I sent along with a unique identifier.
