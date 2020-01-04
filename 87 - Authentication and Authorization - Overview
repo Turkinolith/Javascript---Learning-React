@@ -1,0 +1,10 @@
+******************************************
+**** Authentication and Authorization ****
+******************************************
+This section will involve extending the Vidly app to allow users to register, log-in, and log-out.
+
+Will cover: 
+JSON web tokens, 
+calling protected API endpoints (endpoints that require the user to be logged in and/or have certain permissions), 
+showing/hiding elements on a page based on user permissions, 
+Protecting Routes so users can't navigate to certain parts of the app if they are not authorized.
