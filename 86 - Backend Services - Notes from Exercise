@@ -1,0 +1,88 @@
+In this exercise, well it was really 2 exercises but I treated it as one big one, i needed to write a backend hookup to the Vidly application.
+
+I imported the httpService and logService I used in my previous app, then I went through and converted the fakeGenreService and fakeMovieServie
+to interface with my mongoDB server.
+
+Lessons learned:
+
+1 - How to actually use the debugger in VSCode: This was a godsend for fixing issues I came across! Apparently the ID# for the "fake" db
+  is different from the ID# in the "real" db. I would have kept scratching my head as to why nothing was working untill I properly debugged
+  the values and stepped through the code, realizing that the values were being loaded corretly but failing the match due to the ID's being different.
+  
+2 - Don't try to keep "all" of the code from a prototype implementation. I actually got most of the project on my own, except for updating movie entries
+  or adding new ones. So I turned to seeing the instructors solution here. That was enlightening because the old method used modifications for array logic.
+  In working with the "real" db most of that wasn't needed. The only thing of note was I needed to strip the ID#'s off and allow the DB to assign them.
+  
+3 - If I get into a weird situation where my auto-linter attries to do something like "const varName = await (await functionName()).data" 
+  That is a great indication I need to use object destructuring like this: "const { data: varName } = await functionName()"
+  
+4 - Don't forget when deleting data in an optimistic update to have a backup in case things fail to undo the change.
+
+  handleDelete = async movie => {
+    const originalMovies = this.state.movies;
+    const movies = originalMovies.filter(m => m._id !== movie._id);
+    this.setState({ movies });
+
+    try {
+      await deleteMovie(movie._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error("This movie has already been deleted.");
+      this.setState({ movies: originalMovies });
+    }
+  };
+
+  handleLike = movie => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index] = { ...movies[index] };
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
+  };
+  
+********************************
+**** CODE - genreService.js ****
+********************************
+import httpService from "./httpService";
+import { Endpoint } from "../config.json";
+
+export function getRealGenres() {
+  return httpService.get(Endpoint + "/genres");
+}
+
+
+
+
+********************************
+**** CODE - movieService.js ****
+********************************
+import httpService from "./httpService";
+import { Endpoint } from "../config.json";
+
+const movielist = Endpoint + "/movies";
+
+function movieURL(id) {
+  return `${movielist}/${id}`;
+}
+
+export function getRealMovies() {
+  return httpService.get(movielist);
+}
+
+export function getRealMovie(id) {
+  return httpService.get(movieURL(id));
+}
+
+export function saveRealMovie(movie) {
+  if (movie._id) {
+    const body = { ...movie };
+    delete body._id;
+    return httpService.put(movieURL(movie._id), body);
+  }
+
+  return httpService.post(movielist, movie);
+}
+
+export function deleteMovie(id) {
+  return httpService.delete(movieURL(id));
+}
