@@ -1,0 +1,57 @@
+
+******************************************
+**** Submitting the Registration Form ****
+******************************************
+
+Currently I have 2 services in the Vidly application for working with the API endpoints. Genre and movie service.
+I'll take the same approach, call it userService and make it responsible for talking with the users endpoint.
+
+#1 - Add a new file in the services folder.
+#2 - Copy in a few lines of code from movieService to speed things up:
+	import http from "./httpService";
+	import { apiUrl } from "../config.json";
+	const apiEndpoint = apiUrl + "/movies";
+
+#3 - Change the concated "/movies" to "/users"
+#4 - add an exported function named register that takes user as an argument. It should submit an http.post to the users endpoint with an object as its 2nd paramter.
+	The format of the object should be: email: user.username  **NOTE: this is because in the registration form (registerForm.jsx) I called this property "username" in the data state and not "email".
+	This is a commonly encountered thing in a job environment as the people writing the backend may not use the same name conventions as those on the frontend. If you can be consistant that is best overall.
+	
+#5 - Continuing the object construction we get: {
+	http.post(apiEndpoint, {
+	  email: user.username,
+	  password: user.password,
+	  name: user.name
+	  });
+
+#6 - So this http request is sent to the server and we return the promise.
+
+export function register(user) {
+    return http.post(apiEndpoint, {
+        email: user.username,
+        password: user.password,
+        name: user.name
+    });
+}
+
+#7 - Now we go back to the registerForm and hook this up there.
+	Type A: You can import a single function like this:  import { register } from "../services/userService";
+	Type B: You can import all functions like this: import * as userService from "../services/userService";
+	*I'll go with type B here.
+
+#8 - Now I'll fill out the "doSubmit" method.
+		userService.register(), 
+	now I want to pass into it the state data so:
+		userService.register(this.state.data);
+	Now, because this is an async method I need to await it.
+		await userService.register(this.state.data);
+	finally, I need to mark the function as async. Since this is a simple function I put the async next to the empty parameters.
+	  doSubmit = async () => {
+	   await userService.register(this.state.data);
+	  };
+	  
+#9 - Now, I'll test this using the register page of the app.
+	I put in info and hit Register. Currently I don't have any feedback when the form is submitted but under dev tools under the network tab I'll see the network activity.
+	First is a 204 - OPTIONS, then a 200 OK POST operation with the payload being the submitted form data.
+	If I look back at MongoDB Compass, I'll see the values in my users DB have grown and the new entry is there.
+	**Note: The password there is salted and not in raw text. Likely due to the way the DB is set up which isn't exactly covered in this course.
