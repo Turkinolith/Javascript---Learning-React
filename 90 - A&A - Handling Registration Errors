@@ -1,0 +1,41 @@
+**************************************
+**** Handling Registration Errors ****
+**************************************
+
+In the last section I learned that to handle server errors I need to wrap the statement of the "doSubmit" method within registerForm.jsx in a "Try/Catch" block.
+
+  doSubmit = async () => {
+    try {
+      await userService.register(this.state.data);
+    }
+    catch (ex) {
+      if (ex.response && ex.response.status === 400)
+    }
+  };
+So, try to submit the data, if it has an exception it gets caught. First we need to check if that exception has a response and if the response status is 400, that means that the exception is a "Bad Request" which means 
+that the data was malformed in some way, and we should return one or more errors on the form.
+In this case the only kind of error we'd get is "user already registered"
+So, just like before I should clone the error object: make a new one and spread this.state.errors:
+	const errors = { ...this.state.errors };
+Then set errors.username, here I could pass an error message, or use an error message from the server. The server error message is accessed at "ex.response.data" in this case.
+	errors.username = ex.response.data;
+Finally, we set the state and pass the new errors object.
+
+	  doSubmit = async () => {
+		try {
+		  await userService.register(this.state.data);
+		} catch (ex) {
+		  if (ex.response && ex.response.status === 400) {
+			const errors = { ...this.state.errors };
+			errors.username = ex.response.data;
+			this.setState({ errors });
+		  }
+		}
+	  };
+
+Now lets test this by trying to resubmit an already existing user.
+	Error msg "User already registered"
+
+Now, in a real-world scenario at this point I would want to automatically log-in the user and redirect them to the home page.
+But lets temporarily table this and instead focus next on the Login form.
+When that is built-out then I can come back to this and set up the auto-log-in feature.
