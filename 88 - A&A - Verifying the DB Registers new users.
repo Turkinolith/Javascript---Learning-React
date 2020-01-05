@@ -1,0 +1,21 @@
+********************************
+**** Registering a New User ****
+********************************
+
+The first thing that should be implemented is registering the user.
+
+Before we start, lets verify that the DB responds to requests as expected. Load the mongoDB server and open postman
+in postman send a GET request to the api/users, the DB should respond with a 404 error.
+
+Now, switch the type to post, go to body, set to raw and JSON as the type.
+Format the post in a test format like such:
+{
+	"email": "user1@domain.com",
+	"password": "12345",
+	"name": "Larry"
+}
+
+If you send that to the server you should get a 200 "OK" response.
+If you send it a 2nd time you should get a 400 "Bad Request" user already registered reply.
+
+200 or 400 should be the only valid replies to a Post request to users.
