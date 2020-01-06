@@ -1,0 +1,17 @@
+
+********************************************
+**** Logging in a User, JSON WEB TOKENS ****
+********************************************
+
+Similar to the api/users endpoint for creating a new user there is another, /api/auth for managing authentication sessions.
+In order to log in a user we should send a POST request to that endpoint and in the body should have a JSON object with 2 properties. email and password. 
+If we send a valid email and password combination the server will give us what we call a JSON web token.
+
+To test this, I use Postman and point it towards http://localhost:3900/api/auth
+Then, I create a JSON object with email and password for a known combination that gets passed into the backend.
+
+If it is typoed or wrong I get: 400 Bad Request "Invalid email or password."
+If it is correct I get: 200 OK and a long string of random letters/numbers. This is a JSON web token, like an ID card.
+
+In the future whenever the client needs to call API endpoints that need the user to be authenticated the client will send this JSON web token back to the server. 
+  The server will check the token, if it is valid then it will execute the client request.
