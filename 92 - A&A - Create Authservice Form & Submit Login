@@ -1,0 +1,32 @@
+
+***********************************
+**** Submitting the Login Form ****
+***********************************
+
+Once again in the services folder, add a new JS file named "authService"
+This will be responsible for operations like Log-in and Log-out.
+To speed things up will copy the 2 import and the endpoint lines from movieService and paste them into the new file.
+change the apiEndpoint to /auth.
+
+Then export a function login(email,password) 
+it should call http.post pass apiendpoint, and pass an object with 2 properties, email and password. then return the promise from this function
+
+	export function login(email, password) {
+		return http.post(apiEndpoint, { email, password });
+	}
+
+Now on the login form import the new service, I can import just one function with using curly braces.
+Now, in the "doSubmit" method replace what is there with:
+	login(this.state.data.username, this.state.data.password)
+Or replace that with object destructuring:
+	const { data } = this.state;
+	login(data.username, data.password);
+Then, await and async it:
+Final:
+	  doSubmit = async () => {
+		const { data } = this.state;
+		await login(data.username, data.password);
+	  };
+
+Test in the browser, I got errors on email. On investigation I found out that I was passing the password/username backwards :(  
+so, fixed the code and login returns the TOKEN now!
