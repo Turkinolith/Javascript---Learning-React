@@ -1,0 +1,30 @@
+*************************
+**** Storing the JWT ****
+*************************
+When the user successfully logs in they get a JSON web token which is like an ID card. At this point it should be stored on the client.
+Where? Every browser has a small database called "local storage" in this DB we can store key/value pairs.
+
+So, in the doSubmit method of loginForm when I await the promise that I get from the login function I get a response object, it has a property called "data" 
+I can use object destructuring to pick apart the data property, but because I already have another value called "data" in the method I can't use that name. So, I'll rename it to JWT. { data: jwt }
+	const { data: jwt } = await login(data.username, data.password);
+Doing this, I can get the JSON web token in the body of the response.
+To verify this can immediately afterwards do a console.log(jwt);
+
+After removing the console.log I can now save this in the local storage.
+
+Access the "localStorage" object, this is available in all browsers. This object has a few useful methods like "setItem" "getItem", "clear", etc.
+	localStorage.setItem()
+The setItem method takes 2 paramters. key and value. Both of these are strings.
+I'll set the key to 'token' and the value to JWT.
+	localStorage.setItem('token', jwt);
+
+To verify this works, login with a valid username/password and in dev tools go to the "application" tab in Chrome, or "Storage" tab in Firefox, look under "Local Storage" and you will see the key: 'token', and Value "stringvalue" pair.
+The local storage is per-domain. 
+
+
+The last thing needed is to redirect the user to the homepage.
+As mentioned when going over Routing and Navigation when we implement routing the props object will have a property called history that represents the browsers history.
+So we can call the push method to navigate the user to a different address such as the homepage. 
+	this.props.history.push('/');
+
+Now the login form is working properly, next I'll refactor the registration form so that when you register it auto-logs you in so you don't have to manually fill in the log-in form one more time.
