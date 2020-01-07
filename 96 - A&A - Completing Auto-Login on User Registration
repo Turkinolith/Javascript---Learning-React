@@ -1,0 +1,27 @@
+After exposing the custom header on the backend, now the header shows up to the client upon registration.
+
+Back in the registerForm.jsx in the doSubmit method:
+lets replace the clg with: localStorage.setItem, it takes 2 arguments. First one is the key value as a string so I set it to 'token', the second is the value which I will extract with response.headers['x-auth-token']
+	localStorage.setItem('token', response.headers['x-auth-token']);
+
+Finally, I'll redirect the user to the home page:
+this.props.history.push('/');
+
+
+Final code for doSubmit:
+
+  doSubmit = async () => {
+    try {
+      const response = await userService.register(this.state.data);
+      localStorage.setItem('token', response.headers['x-auth-token']);
+      this.props.history.push('/');
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+On test it takes me back to the home page on log-in. Opening dev tools and checking local storage shows that I have a web token in local storage. Looks good!
