@@ -1,0 +1,71 @@
+
+************************************************************
+**** Extract Data from Web Token - Getting Current User ****
+************************************************************
+
+To start with, open App.js.
+In the App component it would be nice to have the current user in the state, then when rendering the NavBar I could easily pass the current user as a prop.
+I could also pass the user to any other components in the component tree.
+
+I'll add a state property and init it to an empty object.
+	state = {};
+	
+Next, implement componentDidMount() lifecycle hook.
+In this I'll get the JSON web token from local storage, decode it to get the current user, and update the state.
+
+1 - call localStorage.getItem, key is "token", so this returns a JSON Web Token. 
+	const jwt = localStorage.getItem("token");
+
+2 - Now I need to decode this. To do so I'll need to use a library, I'll use "jwt-decode" which I can install via NPM.
+
+3 - Import jwt-decode into App.js, I'll just call it jwtDecode.
+	*Note the import groupings in App.js, 3rd party module imports are on the top, followed by components, followed by CSS modules.
+	
+
+4 - Now, back in the componentDidMount, call jwtDecode and pass the JSON web token into it.
+	const user = jwtDecode(jwt);
+	To verify it works I'll log it to console:
+		  componentDidMount() {
+			const jwt = localStorage.getItem("token");
+			const user = jwtDecode(jwt);
+			console.log(user);
+		  }
+	
+	After logging in and verifying I had a local storage token, I reloaded the page and get the following log:
+		*NOTE: iat is the time the JSON web token is generated.
+		
+		_id: "5e139df3af4e783c50cdb3b0"
+		email: "tester@tester.com"
+		iat: 1578431886
+		name: "LB"
+
+5 - So now I have the user object, now I need to update the state.
+	this.setState({ user });
+
+	This will cause the state to be updated and the app component to be re-rendered. Now I can pass the user as a prop.
+
+6 - In the Navbar render, I'll pass a prop for the user to it.
+	<NavBar user={this.state.user}/>
+	
+7 - The above is the base idea. Now, to consider edge cases.
+	
+	What if the app loads and we don't have a JSON web token in local storage? That is the case for anon users.
+	
+	The app will crash! "Invalid token specified"
+	
+	So, if I pass NULL, Empty String, or an invalid JSON web token to the jwtDecode function we will get an exception.
+	
+	To address this, I need to wrap the componentDidMount code in an try/catch block.
+	So, create a try and move all of the code into it.
+	
+	for the catch, I'll just pass an empty code block as technically this isn't an error. this is only to handle the scenario where we don't have a valid JSON web token in the local storage.
+	
+	Final Code:
+	
+  componentDidMount() {
+    try {
+      const jwt = localStorage.getItem("token");
+      const user = jwtDecode(jwt);
+      this.setState({ user });
+    } catch (ex) {}
+  }
