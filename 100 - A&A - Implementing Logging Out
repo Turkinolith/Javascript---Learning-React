@@ -1,0 +1,47 @@
+
+****************************
+**** Logging Out a User ****
+****************************
+
+Now to implement the log-out feature. As discovered earlier if I delete the localStorage token, the user gets logged out. So basicly if I have a valid token I'm logged in, otherwise logged out or anon.
+
+So to implement I need to register the /logout route and at that route I need to render the logout component, which is a new component I'll need to create, and when that component is mounted it will delete the token from localStorage and take the user back to the home page.
+
+1- In the components folder add a new file: logout.jsx.
+	Import React Component.
+	Create a class called Logout
+	don't need a state, so delete that.
+	Won't render anything so just return null for render.
+	
+2- Add componentDidMount() {
+	Here we should remove the token from local storage:
+		localStorage.removeItem('token');
+
+3- Redirect the user to the home page.
+	Just like before, I'll use window.location="/"; to force a reload.
+
+Final Code for logout.jsx:
+
+import React, { Component } from "react";
+
+class Logout extends Component {
+  componentDidMount() {
+    localStorage.removeItem("token");
+    window.location = "/";
+  }
+
+  render() {
+    return null;
+  }
+}
+
+export default Logout;
+
+
+4 - Back in App.js register a new route.
+	import Logout from "./components/logout";
+	<Route path="/logout" component={Logout} />
+	
+
+Test the feature, verify that the local Storage is cleared and everything re-renders to the logged out state. Perfect!
+
