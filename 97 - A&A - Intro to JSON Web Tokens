@@ -1,0 +1,31 @@
+
+*************************
+**** JSON Web Tokens ****
+*************************
+
+**What is a JSON Web Token Really?**
+in the local storage lets copy the JSON web token and head to jwt.io, this is a main website for working with JSON web tokens. It has a comprehensive intro to JSON web tokens.
+There is a library section that has libraries for different platforms. With those libraries we can generate and validate JSON web tokens.
+In other backend setups I might encounter different technologies, such as JWI-CORE, DJANGO, etc. I can always come back here and find the library for the platform I'm using.
+
+In this example I'm going to be looking at the Debugger.
+With the debugger I can decode a JSON web token and look at its content.
+
+When I paste in the encoded token, I can see it has 3 parts:
+1:
+The header, shown in red, encode algorithm and token type, which is pretty standard and all tokens have it. We don't generally worry about it.
+
+2:
+The Payload, shown in purple, Data. Its an encoded version of the JSON object. It has properties like the ID of the user, name, email, and time the token was generated.
+	The payload has various attributes about the user. We refer to these as "Claims". So the token is claiming their ID is ###, name is ###, email is ###
+
+3:
+The last part, in blue, is the "Verify Signature" Its generated based on the header, the payload, and a secret that is only available on the server. 
+	This prevents a malicious user from  getting their own JSON webtoken and modifying it to pretend to be someone else.
+	Because the moment you modify any of the properties the digital signature needs to be regenerated and to do so this requires the private key which is only available on the server.
+	So, unless someone gets access to the server and finds the private key they can't modify their token to be someone else.
+	
+In the payload we have attributes about the user, so we can decode the token, extract the attributes, and display the users name on the navigation bar.
+**COOL NOTE:
+Because we have basic info about the user in the web token payload, that means we also don't have to keep re-querying the database every time we want to find the user name or email.
+All this basic info is included in the Token already.
