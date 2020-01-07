@@ -1,0 +1,101 @@
+********************************************
+**** Displaying Current User on Element ****
+********************************************
+
+*In this case, the NavBar
+
+Since the current user is being passed as a prop to the NavBar component I'll open up navBar.jsx.
+
+Since the NavBar is a functional component I can either add props as a paramter to the function: const NavBar = ( props ) => {
+Or
+I can use object destructuring to access the user paramter directly: const NavBar = ({ user }) => {
+
+Now, with this I can render the login and register <NavLink> sections conditionaly!
+
+To do this:
+	Select both navlinks and put them within an expression (curly braces).
+	To conditionaly render them add an expression: !user &&
+	
+	Code will look like this:
+	      {!user && <NavLink className="nav-item nav-link" to="/login">
+            Login
+          </NavLink>
+          <NavLink className="nav-item nav-link" to="/register">
+            Register
+          </NavLink>}
+
+So, if we don't have a user it will render the login and register links. 
+
+There is an error though: "JSX expressions must have one parent element."
+So, we need to wrap those 2 navlinks inside of a react fragment.
+
+	Final Code:
+	
+	  {!user && (
+		<React.Fragment>
+		  <NavLink className="nav-item nav-link" to="/login">
+			Login
+		  </NavLink>
+		  <NavLink className="nav-item nav-link" to="/register">
+			Register
+		  </NavLink>
+		</React.Fragment>
+	  )}
+
+Now, I need a similar structure for the scenario I do have a user. I want to display the user name and a log-out link.
+
+So, lets duplicate the above block and modify it:
+1 - Remove the NOT operator. If we do have a user we want this to render.
+2 - I want to render the user name so replace Login with {user.name}
+3 - If the user clicks their name, I probably want to take them to the profile for that account so I'll change the to="" section to to="/profile", or myprofile, or me, whatever I want to call it.
+4 - For the 2nd link instead of Register I'll make it "Logout" and change the address accordingly.
+
+Neither the Profile Page nor the Logout pages have been implemented yet, but the links do appear correctly on the Navbar.
+For now to manually log-out I need to access the local storage and remove the token.
+After doing so and refreshing the page, now I see the "Login" and "Register" links in the NavBar.
+
+There is an issue with this implementation, If I go into the login page and log-in we get redirected to the home page but we still have the Login and Register links on the Navbar.
+If I refresh the page the problem goes away.
+
+Why?
+In the app component I am getting the local storage JSON token and am decoding it within the componentDidMount method. 
+This is called only once in the lifecycle of the app. Since the App component is mounted once and then whenever we change the state it is re-rendered. 
+To solve this we need to go back into the log-in form and instead of using this.props.history.push("/") to take the user back to the home page we need to do a full re-load of the app.
+So this needs to be changed to: window.location ="/";
+This will cause a full reload of the page and as a result the app component will be mounted again and it will be caught to update the page.
+
+This same technique is also needed in the registerForm.
+
+Example from loginForm:
+  doSubmit = async () => {
+    try {
+      const { data } = this.state;
+      const { data: jwt } = await login(data.username, data.password);
+      localStorage.setItem("token", jwt);
+      window.location = "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+
+Example from registerForm:
+
+
+  doSubmit = async () => {
+    try {
+      const response = await userService.register(this.state.data);
+      localStorage.setItem("token", response.headers["x-auth-token"]);
+      window.location = "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
