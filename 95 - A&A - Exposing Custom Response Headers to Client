@@ -1,0 +1,58 @@
+
+***********************************************
+**** Logging in the user upon registration ****
+***********************************************
+Use Postman to submit a new user registration. After successfully submitting the form and getting back a status 200 look at the Headers tab of the server response.
+These are the HTTP headers sent by the server.
+
+Note there is a custom header "x-auth-token", so whenever a header starts with "x" that means it is a custom header that is not part of standard HTTP protocol.
+
+In this case, the custom header is the JSON web token.
+With this, when we register a user we can read the HTTP header, extract the JSON web token, store it in the local storage, and redirect the user.
+
+In the instructors implementation of the back end he decided to use a custom HTTP header, but you might prefer to return the web token in the body of the response just like we did the "_ID", "name", and "email".
+The reason the instructor did this goes back to the NODE course as he wanted to teach the students how to work with custom HTTP headers.
+
+In registerForm.jsx:
+in the doSubmit function when we call the register function we should get the response, we will log it on the console first.
+
+config: Object { timeout: 0, xsrfCookieName: "XSRF-TOKEN", xsrfHeaderName: "X-XSRF-TOKEN", … }
+data: Object { _id: "5e14d9009a00a567a876e9d5", name: "Larry Test", email: "user3@test.com" }
+headers: Object { "content-type": "application/json; charset=utf-8" }
+request: XMLHttpRequest { readyState: 4, timeout: 0, withCredentials: false, … }
+status: 200
+statusText: "OK"
+
+I've already looked at the data and status property of the promise response object, now lets look at headers.
+**Note in the headers section it does not display the custom headers. This is a common issue React developers face.
+
+To fix this, we need to go to the backend implementation and set an additional header in the response.
+
+First, lets stop the backend running process using ctrl-c in the terminal window. Now, open the project vidly-api-node in VS Code.
+Under the routes folder open users.js, this is the implementation of the users endpoint.
+on line 13 is the router.post method.  If we send an HTTP Post request to the server, this function is the one that will be executed.
+On line 27 there is a custom header being set "x-auth-token", but in order for the client to be able to read this custom header we should set an additional header that is a standard HTTP header.
+.header(), we call this method and pass 2 arguments, the first is the key. "access-control-expose-headers" This header lets a webserver whitelist the headers that the browser or the client is allowed to access.
+the second argument is set to "x-auth-token", which is the token set in the line above that is being whitelisted.
+	.header("access-control-expose-headers", "x-auth-token")
+
+Code for the function is now:
+
+router.post("/", async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  let user = await User.findOne({ email: req.body.email });
+  if (user) return res.status(400).send("User already registered.");
+
+  user = new User(_.pick(req.body, ["name", "email", "password"]));
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(user.password, salt);
+  await user.save();
+
+  const token = user.generateAuthToken();
+  res
+    .header("x-auth-token", token)
+    .header("access-control-expose-headers", "x-auth-token")
+    .send(_.pick(user, ["_id", "name", "email"]));
+});
