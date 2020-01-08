@@ -1,0 +1,109 @@
+
+*********************
+**** Refactoring ****
+*********************
+
+In app.js, logout.jsx, and loginForm.jsx I'm working with localStorage and using the key "token".
+If someday I were to change the name of that key, there are now multiple locations in the app that I need to go and update the key value or else the app will be broken.
+Technically I should only have a single module where I have the implementation of authentication. Anything about authentication should be implemented in that module.
+
+Currently, I do have a module for that: authService.js 
+In that module I only have a login method and In it I send a post request to the server.
+Ideally, I should move the logic of storing the token in local storage or removing it inside of the authservice. That way this module is the only place in the app where authentication is implemented. Right now its scattered in different components.
+
+Lets refactor this step by step:
+
+1- LoginForm.jsx
+	I should move the line "localStorage.setItem("token", jwt);" into the auth service. So cut it from loginForm.
+
+2- In authService.js instead of returning the post from the login function I should await it to get the response, then in the response I'll get the data property and rename it to jwt.
+	const { data: jwt } = await http.post(apiEndpoint, { email, password });
+Then, I'll paste the copied code below it:
+	const { data: jwt } = await http.post(apiEndpoint, { email, password });
+	localStorage.setItem("token", jwt);
+	
+So, I send an http request to the server, I get the token and store it in local storage. Now, because I use await I should mark the function as async:
+
+	export async function login(email, password) {
+	  const { data: jwt } = await http.post(apiEndpoint, { email, password });
+		localStorage.setItem("token", jwt);
+	}
+
+3- Now go back to loginForm and simplify the implementation. I no longer need to extract the token from the login response so I can remove that section of it. 
+	const { data: jwt } = await login(data.username, data.password);
+	BECOMES:
+	await login(data.username, data.password);
+	
+	*NOTE: the redirect window.location="/"; is not moved as well. Why is that?
+		Because what happens after the scope of logging in a user is the responsibility of the consumer of the log-in function. You might want different components to handle things differently after log-in.
+		What happens after the user is logged in is not the responsibility of the log-in function.
+	
+4- In logout.jsx, cut the line for removing the token.
+	In authService add a new exported function:
+		export function logout() {
+		localStorage.removeItem("token");
+		}
+	Back in logout.jsx import the logout function from authservice and simply call the logout function.
+	*remember: what happens after logout is not the responsibility of the logout function.
+Instructor prefers to implement this in an object oriented way, so import an object like auth, and call auth.logout()
+To do things this way go back to the authService and export a default object that has the login and logout functions.
+	export default {
+		login,
+		logout
+	};
+Then back in login form at the top instead of importing the login function change it to: import auth from "../services/authService";
+Then, change the line "await login(data.username, data.password)" to "await auth.login(data.username, data.password);"
+Similarly in logout.jsx: auth.logout();
+
+5- Back in app.js: move the const logic section in the componentDidMount block into the auth service because this is the implementation detail of getting the current user.
+	The app component shouldn't know about where the token is stored or about decoding JSON. this is the application detail.
+	ideally the app component would ask authService for the current user and we either get one or not.
+	We don't even need the try/catch block in app.js then.
+	So I'll cut all of the code out of the componentDidMount block,
+	I'll go to authService and create a new function called getCurrentUser()
+	It will have the try block, it'll get the token, it'll decode it, but I wont' update state, because thats the responsibility of a component, so I'll cut that line out.
+	If we can successfully decode the token, we will get a user object so I'll simply return it there. Otherwise if I get an exception I'll return null, that means we don't have a current user.
+	
+		export function getCurrentUser() {
+			try {
+			  const jwt = localStorage.getItem("token");
+			  return jwtDecode(jwt);
+			  
+			} catch (ex) {
+			  return null;
+			}
+		  }
+	Now, I'll add this function to the default object I'm exporting.
+	
+	Back in app.js in componentDidMount I create a constant named user that is equal to auth.getCurrentUser
+	Then I set the state to the user value.
+	
+	  componentDidMount() {
+		const user = auth.getCurrentUser();
+		this.setState({ user });
+	  }
+	 
+
+6- Lastly, I need to refactor the registerForm. Once again here I'm directly working with localStorage, I should push this to the auth service.
+	So, I register the user with the userService, then I need to tell authservice to store the token.
+	Currently in authservice I have a login method that takes an email and password.
+	I need another function or methd that will log in the user using a JSON webtoken. So in that function I won't call the server, I'll simply store the token.
+	
+	I'll make another function called loginWithJwt(), it passes a jwt argument, and it simply calls localStorage.setItem
+		export function loginWithJwt(jwt) {
+			localStorage.setItem("token", jwt);
+		}
+	
+	now, add this new method to the default object.
+*Note: technically I don't need to export all the methods because I'm exporting the default object and can access them with the object. But I can keep them exported if I just want to import an 
+individual method in another module.
+	
+7- Back in the registerForm: 
+	Import auth service
+	Replace the localStorage.setItem("token", section and replace with auth.loginWithJwt( like this:
+		auth.loginWithJwt(response.headers["x-auth-token"]);
+	
+8- Now, the authService is the only place that directly works with the localStorage, if I need to come back at some later date and rename the token value I only need to change it in this one location.
+
+9- To make the code even better, replace all occurrences of the word "token" with a constant. I'll call it "tokenKey"
+
