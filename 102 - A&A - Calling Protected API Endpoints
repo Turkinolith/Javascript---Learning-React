@@ -1,0 +1,29 @@
+*****************************************
+**** Calling Protected API Endpoints ****
+*****************************************
+
+These are endpoints that require the user to be authenticated/logged-in and potentially have certain permissions.
+To explain this point I re-enabled the "requiresAuth" setting on the node backend. Now, when trying to edit an entry in the DB without being logged in I get a 401 "Unauthorized" error.
+	That means the API Endpoint required the client to send a JSON webtoken but the client didn't send that.
+
+Look at httpService.js:
+This module is responsable for making HTTP calls to the backend. Its also the only place where I've configured "Axios" so this is the only place I need to modify.
+I'll add an additional line for configuring default headers. So I'm telling axios "Whenever you are sending an HTTP request, include this header in the request.
+	axios.defaults.headers.common <- With this I can set the headers on all kinds of HTTP requests. GET, POST, Etc.  axios.defaults.headers.post <- example that you can also configure headers for specific types of requests, like POST only in this case.
+	
+	axios.defaults.headers.common['x-auth-token'] <- Here we need to gget the users token from localStorage but we don't want to directly talk with localStorage, we want to call the auth service so that is the only module that handles these things.
+	
+	So, need to import auth from authservice. Now call auth, currently don't have a method to get the token. I have "getCurrentUser" which returns a user object, so I need to add a new method to do this.
+	
+	In authService.js I generate a new method I'll call getJwt() 
+	In this function simply return localStorage.getItem(tokenKey);
+
+code added to authService.js:
+export function getJwt() {
+  return localStorage.getItem(tokenKey);
+}
+
+code added to httpService.js:
+import { getJwt } from "./authService";
+
+axios.defaults.headers.common["x-auth-token"] = getJwt();
