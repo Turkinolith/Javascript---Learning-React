@@ -1,0 +1,46 @@
+
+********************************************
+**** Fixing Bi-directional Dependencies ****
+********************************************
+axios.defaults.headers.common["x-auth-token"] = getJwt();
+In the last exercise I wrote this line of code in the httpService to fix the issue with calling protected API endpoints.
+However, I've created a very common, and dangerous, design issue. This is called a "Bi-directional Dependency"
+
+We can see on the top we have a dependency of the Auth service, and if we look on the authService we have a dependency of the HTTP service. 
+So we have a "Bi-directional Dependency" I need to get rid of this, otherwise eventually it can cause problems.
+
+So, how to remove the dependency loop? First, identify which of the modules is more of an "essential" or "Core" module.
+In this case, it would be the http module. because if we didn't have it we could not make connections to the back-end and authentication wouldn't even make sense.
+Auth module should be on "top" of the HTTP module.
+
+So, in httpService I should remove dependencies of the auth module.
+
+1- Delete the authService import on line 3.
+
+2- On line 5 now, I need to get the JSON web token. So, how to do this without having a dependency on the Auth module?
+
+	I can reverse the statement. Instead of the HTTP module telling Auth services "Give me a JSON token" IE: getJwt()
+	Have Auth service tell Http module what the token is: setJwt()
+	
+3- Cut line 5 (the setting headers = to getJwt().
+
+4- Add a new function called setJwt(jwt) that takes a token as the argument. within it paste the cut line of code, but instead of getting JWT just pass the jwt argument.
+
+	function setJwt(jwt) {
+	  axios.defaults.headers.common["x-auth-token"] = jwt;
+	}
+
+5- Add the above function to the default export object.
+
+export default {
+  get: axios.get,
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete,
+  setJwt
+};
+
+6- in authService I'm already importing http service so I can write the line:
+	http.setJwt, I already have a getJwt() method so I can call that here to pass the value:
+		http.setJwt(getJwt());
+		
