@@ -1,0 +1,74 @@
+
+***********************
+**** Authorization ****
+***********************
+Currently I can not delete a movie entry. This is because the backend of the app has been implemented such that only admins can delete entries.
+
+To see how this works, lets look at the backend project. In the routes folder lets look at the movies module.
+on line 67 is router.delete method.
+You are telling express, which is the framework used to build this backend app, that if you get a delete request at the movies endpoint make sure the client is
+authenticated and is an admin.
+
+**MIDDLE-WARE FUNCTIONS**
+So, the auth and admin in the line here are 2 functions.: router.delete("/:id", [auth, admin], async (req, res) => {
+These are referred to as "Middle-ware Functions"
+
+
+**Middlewear: Auth.js**
+Here is a copy of the code in auth.js in the middleware folder:
+const jwt = require("jsonwebtoken");
+const config = require("config");
+
+module.exports = function(req, res, next) {
+  if (!config.get("requiresAuth")) return next();
+
+  const token = req.header("x-auth-token");
+  if (!token) return res.status(401).send("Access denied. No token provided.");
+
+  try {
+    const decoded = jwt.verify(token, config.get("jwtPrivateKey"));
+    req.user = decoded;
+    next();
+  } catch (ex) {
+    res.status(400).send("Invalid token.");
+  }
+};
+
+So, auth is a function and it checks the config to see if auth is enabled or not. If disabled it passes control to next middle-wear function.
+Otherwise, it reads the header from the request "x-auth-token" and if we don't have a token return status 401, custom message: "access denied. No token provided."
+If there is a token, validate it. Over the next few lines try to validate the token. If valid pass control to the next middle-ware function. 
+	Otherwise, return a 400 error with the custom message "Invalid Token"
+So, technically 400 means "Bad Request", so we're telling the client this is a bad request because you sent an invalid token.
+This is the whole of the auth middle-ware function.
+
+**Middlewear: Admin.js**
+Here is a copy of the code in admin.js in the middlewear folder:
+
+const config = require("config");
+
+module.exports = function(req, res, next) {
+  // 401 Unauthorized
+  // 403 Forbidden
+  if (!config.get("requiresAuth")) return next();
+
+  if (!req.user.isAdmin) return res.status(403).send("Access denied.");
+
+  next();
+};
+
+This is also a function, at the beginning check authentication, if disabled pass control.
+Otherwise check if user has property "isAdmin" if this is falsy return a 403 status.
+
+And that 403 status is exactly what I get when I tested this.
+So I did send a valid JSON webtoken, just I did not have the proper flag on the user account.
+How to fix this? I need to go to the DB and set the "isAdmin" property of the user object to "true".
+To do this I'll just access the DB through mongoDB Compass. I'll find the user account I'm using, add a new property called "isAdmin" and set it to "true" *NOTE: By default the value is a string, I need to change it to bool.
+Now, even after this change I can't just go back into the browser and immediately start deleting movie entries.
+This is because the old JSON web token I have doesn't have the changes. You can verify this using the jwt.io debugger and putting the token into its debugger.
+Fix for this? The good ole log-out/log-back-in.
+Now, things work properly!
+
+Generally for production you want at least 1 account at the start that has whatever would give admin privilages. You can either use a script to do this or manually edit the DB like in this case.
+Likely though, you would want to make something like an admin panel where you can adjust user permissions directly. It would be the same setup as adjusting other DB entries like we've seen already.
+
+
