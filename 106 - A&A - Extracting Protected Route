@@ -1,0 +1,80 @@
+************************************
+**** Extracting Protected Route ****
+************************************
+
+When using the route component, we supply a path and either a component or a render attribute.
+In this I'll go over creating a new route component called <ProtectedRoute />
+It will have the exact same interface as <Route /> so it takes a path and either a component or a render function, but this ProtectedRoute is aware of the current user.
+If the user is not logged in it will automatically redirect the user to the Login Page. That way I wont have to repeat the same "if (!user) return..." logic for every route that needs to be protected.
+
+In the components folder under common lets build a new jsx. protectedRoute
+It will be a stateless functional component that takes props
+It will simply return a Route component similar to the one I use for movies/:id. So, I can simply copy that route code from App.js and make that as the return statement.
+
+I don't want to hard-code the path and the logic for returning a movie form. I want that to be dynamic.
+So, instead of reading the path as a hard-coded value I can get it from props. 
+So, use object destructuring to extract the path property from the props and pass that into the path attribute.
+
+Now, for the render function I need to know about the current user, so I can get that from the auth service.
+Import auth from the auth service and get current user, if falsy then redirect to login.
+
+In the return I've used both the Route and Redirect components, so I need to import those as well from react-router-dom.
+
+if the user is logged in I want to return a component dynamically for the final return.
+So, instead of returning <MovieForm> I need to pick the component value from the props object and render that as the return value:
+	const ProtectedRoute = ({ path, component }) => {
+	  return (
+		<Route
+		  path={path}
+		  render={props => {
+			if (!auth.getCurrentUser()) return <Redirect to="/login" />;
+			return <component {...props} />;
+		  }}
+
+**HOWEVER: THIS WONT WORK! 
+	Why? because React expects a component to begin with a capital letter. So I can not have an element like the above.
+How to fix?
+Rename the component to Component 
+		const ProtectedRoute = ({ path, component: Component }) => {
+	  return (
+		<Route
+		  path={path}
+		  render={props => {
+			if (!auth.getCurrentUser()) return <Redirect to="/login" />;
+			return <Component {...props} />;
+		  }}
+
+Now, as mentioned this can take either a component or a render function, so it is possible that the component prop may be null. So, I should also pass the render function in props destructuring.
+Now, in the return statement change it to a ternary statement:
+return Component ? <Component {...props} user={user} /> : render(props);
+
+One last thing, in the destructuring I'm extracting path, component, and render, there may be other props that could be passed so I should use the ...rest operator to pass those as well and add them to the route component.
+
+With that done, I can simplify the code a bit. Instead of setting path={path} I can rely upon it being picked up with the {...rest} operator and get rid of it.
+
+Now, back in the app.js, 
+Replace the movies route with a protected Route.
+Now, I set the path as it currently is, but instead of using the render function and checking there if the user is logged in or not, I just set component to {MovieForm} as I had before.
+
+protectedRoute.jsx:
+
+import React from "react";
+import { Route, Redirect } from "react-router-dom";
+import auth from "../../services/authService";
+
+const ProtectedRoute = ({ path, component: Component, render, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={props => {
+        if (!auth.getCurrentUser()) return <Redirect to="/login" />;
+        return Component ? <Component {...props} /> : render(props);
+      }}
+    />
+  );
+};
+
+export default ProtectedRoute;
+
+App.js:
+<ProtectedRoute path="/movies/:id" component={MovieForm} />
