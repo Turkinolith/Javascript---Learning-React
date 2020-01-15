@@ -1,0 +1,95 @@
+*********************************
+**** Redirecting after Login ****
+*********************************
+
+Currently, if I click on a movie entry I get redirected to the login page. After logging in, I get sent back to the main movie list, not the movie form I was going to.
+In this lesson I'll implement sending the user back to the last place they were headed before being redirected to the login page.
+
+In the ProtectedRoute component, if the user is not logged in I redirect them to the login page. So here I need to pass some additional data, that is the current location or where they were trying to go.
+Where do I get this from? The props object.
+
+if I console.log the props object I'll see I have a few options that I can use: location.pathname looks good and match.url also has the same data. 
+the Location property has the user location before they got redirected to the log-in page. That is where they wanted to go, so I'll pass this object to the redirect component.
+First, lets look at the react-router documentation for the Redirect component. 
+https://reacttraining.com/react-router/web/api/Redirect
+
+As noted there, the TO: attribute can be either a string or an object.
+the object is a location object with the properties pathname:, search:, and state:. The state can be used to pass any additional data in the component we are directing the user to.
+
+Back to ProtectedRoute component: 
+Instead of setting the <Redirect> attribute to a string, I need to set it to a location object.
+<Redirect to={{}}
+
+Inside of the object have 2 properties: pathname: '/login', which is the same as before, and set state to pass additional data. set that to an object and add a field { from: } and set that to props.location because that
+location object represents the current location before the user was redirected to the login page.
+
+<Redirect to={{ pathname: '/login', state: { from: props.location} }} />;
+
+Full code:
+import React from "react";
+import { Route, Redirect } from "react-router-dom";
+import auth from "../../services/authService";
+
+const ProtectedRoute = ({ path, component: Component, render, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={props => {
+        if (!auth.getCurrentUser())
+          return (
+            <Redirect
+              to={{ pathname: "/login", state: { from: props.location } }}
+            />
+          );
+        return Component ? <Component {...props} /> : render(props);
+      }}
+    />
+  );
+};
+
+export default ProtectedRoute;
+
+
+
+So, this was the first part. Now need to go to the loginForm component and see if state is set. If it is set, then redirect the user back to where they want to go.
+
+In the loginForm on line 25 is where I redirect the user back to the home page: window.location = "/";
+
+Above that I get this.props.location. This location may have a state property, so using object destructuring I can pick that property.  const { state } = this.props.location;
+Now, I can check if that property exists:
+
+window.location = state ? state.from **NOTE: from is the custom property that I set in protectedRoute.jsx in the location object. This from is a location object, and location objects in react-router have a property called "pathname"
+Otherwise, if state is not defined redirect the user to the home page as I was doing before.
+window.location = state ? state.from.pathname : "/";
+
+Full code for the doSubmit method in loginForm.jsx is now:
+  doSubmit = async () => {
+    try {
+      const { data } = this.state;
+      await auth.login(data.username, data.password);
+
+      const { state } = this.props.location;
+      window.location = state ? state.from.pathname : "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+Now, I can attempt to edit a movie, log in, and get redirected back to the page I came from as expected. But there is one minor issue. Even though I am logged in I can still go to the login form if I type the path directly.
+In this case I want to redirect the user back to the home page.
+
+Back in the login form, down in the render method I can do this:
+if auth.getCurrentUser is defined, return a redirect component to homepage. 
+
+render() {
+  if (auth.getCurrentUser()) return <Redirect to="/" />;
+  
+Because I used the redirect component I need to import this from react router dom on the top.
+Also import auth from "..services/authservice/
+
+*NOTE: Why didnt we use window.location for the redirect?
+	Because we use that only when the user is trying to log-in so we want to reload the app and ensuring that it is remounted and in the right state in terms of knowing the current user.
