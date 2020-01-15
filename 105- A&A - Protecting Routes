@@ -1,0 +1,43 @@
+***************************
+**** Protecting Routes ****
+***************************
+
+In the last lesson, I hid the "New Movie" button, but if I put in the correct URL for that page into the title bar, I can still access that form without logging in.
+
+How to protect the route?
+In App.js, the path for the form is the one with path '/movies':id', I already set it to use the render method instead of component. I can also use this same technique to protect it. 
+I can pass a function, in that function check if the current user is null, if so redirect them. Otherwise then render the form.
+
+In the body check if user is falsy, if so return the <Redirect component back to the login page. Otherwise return as it currently stands.
+
+To define user, use object destructuring in the render method, but before the return to define user as this.state
+Then, any place in the return where I was defining user as this.state.user can be simplified to user={user}
+
+render() {
+    const { user } = this.state;
+    return (
+      <React.Fragment>
+        <ToastContainer />
+        <NavBar user={user} />
+        <main className="container">
+          <Switch>
+            <Route path="/register" component={RegisterForm} />
+            <Route path="/login" component={LoginForm} />
+            <Route path="/logout" component={Logout} />
+            <Route
+              path="/movies/:id"
+              render={props => {
+                if (!user) return <Redirect to="/login" />;
+                return <MovieForm {...props} user={user} />;
+              }}
+            />
+            <Route
+              path="/movies"
+              render={props => <Movies {...props} user={user} />}
+            />
+
+Now if I try to access localhost:3000/movies/new without being logged in, I'll get redirected to the login form.
+In the future I'll add the redirect URL so the momen the user loggs in they will be redirected back to where they came from.
+
+So, this is how to protect a route. However, this is not an easy solution to re-use in multiple places.
+Next I'll go over how to build a reusable route component that is aware of the current user and can auto-redirect the user if they are not logged in.
