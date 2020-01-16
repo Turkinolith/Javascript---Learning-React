@@ -1,0 +1,30 @@
+*********************************
+**** Building for Production ****
+*********************************
+I've been using "npm start" to begin my development of applications.
+This gives a non-optimized development build, this is because the bundle it generates has additional code that helps with debugging the application.
+But, when generating a build for production I do not want all of that extra code. I want an optimized production build.
+
+To get this: "npm run build"
+
+This will create an optimized production build, in this case in the "build" folder of the project.
+The content of that folder can be sent to the web server using FTP or any other tools.
+
+as npm will inform you, you can test it locally by installing serve: 
+	npm install -g serve
+this is a lightweight simple webserver.
+
+And can start it using: 
+	serve -s build
+
+this loads the contents of the build folder into the serve webserver.
+
+Install serve and launch it, by default it hosts on port 5000
+
+When viewing the webapp there if I view the console I'll see "SUPERMAN undefined"
+This is because I did not set an Environment variable for production.
+
+Recap:
+npm start -> development Build/Development environment variables
+npm run build -> production Build/ Production environment variables
+npm test -> Test Build/ Test environment variables
