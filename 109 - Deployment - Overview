@@ -1,0 +1,10 @@
+*****************************
+**** Deployment Overview ****
+*****************************
+
+#1 - Environment Variables - How to have configs for each environ like Dev, Test, Production.
+
+#2 - Production Builds - How to create optimized builds to deploy to any server.
+
+#3 - Deploy to Heroku - cloud service (that I already have an account for)
+
