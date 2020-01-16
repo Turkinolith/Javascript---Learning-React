@@ -1,0 +1,90 @@
+***************************************
+**** Exercise - Hide Delete Column ****
+***************************************
+Hide the Delete column if the user isn't logged in and if the user account is not an admin.
+
+I managed to get it to work if the user account isn't logged in, but for the admin property I'm not sure what the best practice is for that portion, so I turn to the instructors guidance there.
+*NOTES:
+	Don't have to pass user as props to MoviesTable since I can simply just use auth.getCurrentUser() instead.
+	There are various solutions to hide the delete column if the user is not an admin user. One solution is to add an additional property like "visible" or "hidden" that we can dynamically set, but that solution	
+		would require refactoring multiple components to add support for hiding columns dynamically. 
+		Another solution is to remove the column from the array and only add it if the user is an admin user. This is simpler as we only need to change the moviesTable component. Always pick the simplest solution.
+			Cut the delete column data from the array and add a new constructor method.
+			in the constructor make a const "user" that gets current user.
+			if (user && user.isAdmin) then push a column to the column array. So this.columns.push and paste in the code cut from earlier.
+			BUT: This is messy, what I can do instead is define a property called deleteColumn and set that equall to the object.
+			
+			ALSO: Because we define a custom constructor, need to call the parent by adding super();
+
+NOW IT WORKS!
+I can also remove all of the getuser ternary checks from the delete column content as now I simply don't add the data if the user isn't an admin.
+So this: 
+ deleteColumn = {
+    key: "delete",
+    content: movie =>
+      authService.getCurrentUser() ? (
+        <button
+          onClick={() => this.props.onDelete(movie)}
+          className="btn btn-danger btn-sm"
+        >
+          Delete
+        </button>
+      ) : null
+  };
+  
+  
+Goes back to this:
+
+ deleteColumn = {
+    key: "delete",
+    content: movie =>
+        <button
+          onClick={() => this.props.onDelete(movie)}
+          className="btn btn-danger btn-sm"
+        >
+          Delete
+        </button>
+  };
+
+
+
+
+Final Code from moviesTable.jsx:
+
+class MoviesTable extends Component {
+  columns = [
+    {
+      path: "title",
+      label: "Title",
+      content: movie => <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+    },
+    { path: "genre.name", label: "Genre" },
+    { path: "numberInStock", label: "Stock" },
+    { path: "dailyRentalRate", label: "Rate" },
+    {
+      key: "like",
+      content: movie => (
+        <Like liked={movie.liked} onClick={() => this.props.onLike(movie)} />
+      )
+    }
+  ];
+  
+ deleteColumn = {
+    key: "delete",
+    content: movie =>
+      authService.getCurrentUser() ? (
+        <button
+          onClick={() => this.props.onDelete(movie)}
+          className="btn btn-danger btn-sm"
+        >
+          Delete
+        </button>
+      ) : null
+  };
+
+  constructor() {
+    super();
+    const user = authService.getCurrentUser();
+    if (user && user.isAdmin) this.columns.push(this.deleteColumn);
+  }
+
