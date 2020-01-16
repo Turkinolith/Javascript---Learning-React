@@ -1,0 +1,16 @@
+*********************************
+**** Deploying the Front-End ****
+*********************************
+#1 - As before, create a git repository if you have not already done so.
+#2 - use a buildpack for apps created with create-react-app.   https://elements.heroku.com/buildpacks/mars/create-react-app-buildpack
+	A buildpack is a collection of scripts that prepare an app to be deployed to heroku. There are a bunch of them for various environments, ruby, node, etc.
+		heroku create --buildpack mars/create-react-app
+
+Setting buildpack to mars/create-react-app... done
+https://frozen-fjord-67313.herokuapp.com/ | https://git.heroku.com/frozen-fjord-67313.git
+
+#3 - The final step is to push our code from our local repository to the remote repository.
+	git push heroku master
+	heroku open
+	
+	YAY! IT WORKS!
