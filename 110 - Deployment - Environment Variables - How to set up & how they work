@@ -1,0 +1,72 @@
+*******************************
+**** Environment Variables ****
+*******************************
+
+Earlier on I created config.json to store config parameters.
+That was a quick and simple solution, however the parameters are not environment specific. 
+Every app goes through at least 3 environments: Development, Testing, Production.
+
+Sometimes you want the values of these paramters to be different in each setting.
+Example: in Development you can have apiUrl point towards localhost, but in production you want it to point towards a real backend server with real data and config.json isn't going to help with that.
+
+Applications that are generated with Create-React-App have built-in support for environment specific variables.
+
+To do this:
+
+#1 In the root folder of the project create a new file with name .env, Note it does not have a file name, its just the .env extension.
+
+#2 In this environment file we can store all environment variables with their default values.
+	We can also have environment specific files
+		EX: .env.development
+			.env.test
+			.env.production
+	
+	So in .env.development we would put all of the development environment variables. All of these have a key and value.
+	
+	The key should start with: REACT_APP_ if I don't use this prefix, then this won't work in this example
+		EX: REACT_APP_NAME=Vidly in Dev
+			REACT_APP_VERSION=1
+
+#3 To read these go to one of the JS files, for simplicity I'll use index.js but it can be done in any JS file.
+	console.log(process.env);
+	This comes up in the NODE course, process represents the current process and env is a property of this object that represents all of the environment variables.
+		These variables can be set directly in terminal or can come from the configuration files noted above.
+		
+***NOTE*** Whenever I change environment variables I will need to restart the app server because these variables are not automatically tracked.
+		
+	Output is:
+	{…}
+	NODE_ENV: "development"
+	PUBLIC_URL: ""
+	REACT_APP_NAME: "Vidly in Dev"
+	REACT_APP_VERSION: "1"
+	<prototype>: Object { … }
+	index.js:10
+
+	There are a few built-in parameters here: 
+	NODE_ENV is set to "development", but it will be changed to production when I build a production ready package.
+	PUBLIC_URL is another built-in, right now set to an empty string.
+	Below that are the 2 variables I set.
+	
+#4 How to read these variables?
+	Back in the JS file (index.js in this case) in order to get the app name for example, I need to get that property of the object. process.env.REACT_APP_NAME
+	Next I'll add a CLG label, the instructor says to use "SUPERMAN" we'll see why in a sec.
+		console.log("SUPERMAN", process.env.REACT_APP_NAME);
+	
+	Output is:
+	SUPERMAN Vidly in Dev
+	
+	So, whats with the SUPERMAN? Go to the Sources tab on Chrome, or the Debugger tab in Firefox.
+		In Chrome open localhost, static, JS, bundle.js
+		in FF open localhost, static/js, bundle.js
+	
+	This is the main bundle that has all of the javascript code.
+	Within the code, search for SUPERMAN
+	
+	returns:
+	console.log("SUPERMAN", "Vidly in Dev");
+	Look at the 2nd parameter of that log, its not process.env.REACT_APP_NAME, its the value of the variable.
+	
+	***TAKE AWAY*** The expressions that reference an environment variable are replaced with the value of those variables during build time. So, in the terminal when we run "npm start" thats when the build process happens
+		and all of the variables that are stored directly in the shell or in config files are extracted and wherever we have process.env.whatever are replaced with the values.
+		
