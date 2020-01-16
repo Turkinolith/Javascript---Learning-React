@@ -1,0 +1,57 @@
+
+********************************************
+**** Preparing Front-End for Deployment ****
+********************************************
+Earlier I talked about config.json and environment-variables. Before I deploy the front-end to production I need to configure it so that if the app is in production it'll use a different back-end, the one I'm hosting on Heroku.
+Basically I want to get rid of the config.json.
+
+#1 - Create a new .env.production
+#2 - REACT_APP_API_URL= set this to the address of the backend app on Heruku, copy that and paste it in there and ends with /api. Then save it.
+#3 - Now to set the same variable for the dev environment. So, copy that line and go into the related env file, delete everything currently in it, and paste the line in. Replace the address with the line currently in config.json
+#4 - There are a few places where I've used that JSON file, like in authService.js. Lets delete the import line from it and then change the apiEndPoint line that was pointing at it to just use "/auth" so as to not use that prefix.
+		This same change also needs to be made in any other service that uses it: authService, movieService, and userService.
+
+#5 - Now, need to go to the httpService and configure a default property.
+	axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+		As noted before, the process.env.REACT_APP_API_URL will be replaced at build time with the environment variable.
+		
+#6 - Before deploying this app, I can create a production build, serve it locally, and make sure it connects to the production back-end on heroku.
+	npm run build
+
+*****************************************
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+
+  143.66 KB  build\static\js\main.d48511ca.js
+  32.1 KB    build\static\css\main.f1a64328.css
+
+The project was built assuming it is hosted at the server root.
+You can control this with the homepage field in your package.json.
+For example, add this to build it for GitHub Pages:
+
+  "homepage" : "http://myname.github.io/myapp",
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  http://bit.ly/2vY88Kr
+****************************************
+
+Ran the server and verified that I could use all the page features, that I could log in, that I could add a movie to the DB, Verified with my DB Back-end that the database updated with the new entry. Perfect!
+There is a UX issue, if there are no movies in the DB, or when I first load the page and the DB request hasn't filled in yet, I'm getting "There are no movies in the Database" flash on the screen.
+To fix this go back into the movies.jsx and remove the line "if (count === 0) return <p>There are no movies in the database.<p>", this way the framework of the DB list will load and the "Showing 0 movies in the database" will fulfill the same information.
+After fixing the line I need to re-build it: 
+	npm run build
+Next serve it one more time and verify it works as I'd expect. Now it is ready to deploy!
+
+
+
+
+
