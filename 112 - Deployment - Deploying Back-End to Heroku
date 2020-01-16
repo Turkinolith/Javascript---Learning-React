@@ -1,0 +1,124 @@
+
+**************************************
+**** Deploying Back-end to Heroku ****
+**************************************
+#1 - Need a Heroku account
+#2 - Need Heroku CLI installed. 
+	https://devcenter.heroku.com/articles/heroku-cli
+
+#3 - in terminal:
+	heroku -v   //This returns what version installed, in my case 7.35.1
+	
+	heroku login  // This now opens a page where you can log into heroku before returning you back to the CLI.
+	
+	
+******************************
+**** MongoDB in the Cloud ****
+******************************
+
+For this I will need an mlab.com account. This is for deploying the MongoDB database to a cloud server. 
+*NOTE: This has since been rebranded to mongoDB.Atlas
+
+I created the account and generated a test cluster using AWS located in Oregon on the sandbox tier, I named it Tester-00
+I then created a database access user account with read/write (but not admin) permissions.
+
+
+**************************************
+**** Deploying to Heroku - Part 2 ****
+**************************************
+We begin with deployment of the back-end. First go to the api-node backend, add a .gitignore file with node_modules/ as the sole line to ignore the modules folder. Lastly add all of the files into a git repository and commit. *if not done already*
+
+Next, in the vidly-api-node folder I need to create a heroku app.
+	heroku create (after create you can pass a name like "vidly-api" but they must be unique and would need to do something like add an extension to it if I were to ever make an app with the same name. By leaving this blank heroku will auto-generate its own name.)
+	// This gave me the name "desolate-hamlet-#####" with the address for the app as: https://desolate-hamlet-#####.herokuapp.com/
+		So, that http address is where the backend will reside, the frontend will need to send requests to that address/api/whatever. 
+	I also got: https://git.heroku.com/desolate-hamlet-#####.git
+		What is this for? When I create updates of the sourcecode I can push it to that git repository, heroku will get notified that the files changed, it will download the latest source code build it and deploy it to the first address.
+		This is "Continuous Integration"
+	
+	So, I want to push the code I have in my local repository to the remote one on Heroku. 
+		git push heroku master
+		This tells git I want to push to heroku, and master is the name of the current branch.
+		
+	After pushing to heroku I can open it from the cli by using:
+		heroku open
+	
+
+
+***********************************************
+**** Viewing Heroku Logs and fixing errors ****
+***********************************************
+On the heroku dashboard open the page for the app and click on more in the top right. View Logs.
+This gives a simple interface to look at logs, but doesn't always give the details that are needed. Instructor prefers using the terminal.
+
+In terminal, inside of the backend project folder, 
+	heroku logs
+If you scroll up you can see why the app crashed.
+	'MongoNetworkError: failed to connect to server [localhost:27017] on first connect [Error: connect ECONNREFUSED 127.0.0.1:27017',
+This is the default port for mongoDB. 
+
+Back in the backend project go into the config folder.
+open "default.json" there you will see the db path which is set to the local machine db. Obviously this does not exist on the heroku server. This needs to be changed to the address of the mongoDB server on Atlas.
+
+***************************************
+**** SUPER IMPORTANT DATABASE NOTE ****
+***************************************
+NEVER STORE DATABSE LOGIN INFO IN A CONFIGURATION FILE OR SOURCE CODE!
+
+In this project I have default.json which stores default values for config settings, which is fine for a development environment.
+For production I should use environment variables.
+
+
+*************************************************
+**** Setting Environment Variables on Heroku ****
+*************************************************
+Connecting with a connection string. 
+Here I use the test user I created earlier on Atlas: mongodb+srv://vidlyuser:<password>@<APPNAME>.mongodb.net/test?retryWrites=true&w=majority
+**NOTE: Password is to be replaced with the account password.
+After inserting the password I copy the whole string and go back to the terminal.
+
+Now, I want to store this string as an environment variable on heroku. I want to call the variable vidly_db and set it to this string.
+	heroku config:set vidly_db=mongodb+srv://vidlyuser:<password>@<APPNAME>.mongodb.net/test?retryWrites=true&w=majority
+	
+********
+**NOTE**: ampersand is not allowed for heroku as it is reserved. wrap it in double quotation marks ("&") to pass it as part of a string.	
+********  heroku config:set vidly_db=mongodb+srv://vidlyuser:<password>@<APPNAME>.mongodb.net/test?retryWrites=true"&"w=majority
+
+
+now need to make a change in the app code and redeploy it so it can read the connection string from that environment variable.
+
+Here in the vidly-api-node project it uses a module called config and it has a few conventions. in the config folder there is default.json which has default values for application settings.
+We can have another json for test environment, another for production, and so on. 
+
+But there is also the specific json file: custom-environment-variables.json, in this file we map application settings to environment-variables.
+In it there is a map for "jwtPrivateKey" that is mapped to an environment-variable called vidly_jwtPrivateKey.
+So this means in a development Environment the app code is reading that setting from the default.json "jwtPrivateKey"
+So, this means I need to map the "db" setting in default.json towards an environment-variable.
+
+in custom-environment-variables.json, add a new key/value pair. "db": "vidly_db"
+	**NOTE: "vidly_db" is the name of the environment-variable that I set on heroku!
+
+**Note: this implementation is specific to this app, I may not even be using a config file, a different module, or something else. The concept of modifying the code so that it reads the db access string from an environment-variable
+	is the concept and it applies regardless of platform.
+
+So the source has been updated, it now needs to be committed to local repository, then deployed once more.
+	again: git push heroku master
+
+Lets open it again:
+	heroku open
+
+I still had issues, after some research I found a few things:
+	#1 - My heroku config string was wrong. it cut everything after the first ampersand in the string. I need to add double quotations ("&") around it so that it would be read as part of the string.
+	#2 - My DB was only whitelisted for my local machine server. I needed to whitelist all clients to it to open it up for Heroku servers to connect.
+	#3 - I still had trouble accessing the DB even after whitelisting, I went and made some lunch, came back and now it loaded. guess it just needed time for changes to propagate.
+
+Now, the app doesn't crash, it just says "Cannot GET /"
+This is because there is nothing available at the root of the application.
+The instructor failed to include info on populating the Atlas DB with data, but I learned that on my own:
+
+****HOW TO POPULATE THE CLOUD DB WITH PREMADE DATA****
+Using Compass you can export each DB collection into a JSON or CSV file, then you can import that information into the cloud DB.
+**Note that in the string path there is @tester-00-dbmjh.mongodb.net/TEST?retryWrites=true"&"w=majority , the test in caps there is the DB name, in this case I had to replace it with "vidly" to access my new vidly database.
+If you create a new database entry for the tutorial like I did, you will need to change the DB that its pointing to in your login string:
+IE: vidly_db=mongodb+srv://vidlyuser:<password>@<APPNAME>.mongodb.net/<DATABASENAMEHERE>?retryWrites=true"&"w=majority
+	
