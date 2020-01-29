@@ -1,0 +1,30 @@
+Cheatsheet for starting up a new project:
+
+************************
+**** React or Node? ****
+************************
+
+
+***************
+**** React ****
+***************
+create-react-app appname
+
+
+**************
+**** Node ****
+**************
+npm init -y
+
+
+
+*********************
+**** Using Sass? ****
+*********************
+npm i node-sass --dev-save
+
+in package.json add this to the "scripts" section:
+	"compile:sass": "node-sass sass/main.scss css/style.css -w"
+
+in terminal 
+	npm run compile:sass
