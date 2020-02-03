@@ -1,0 +1,14 @@
+*******************************
+**** Advanced React Topics ****
+*******************************
+
+Create-React-App - 
+Going forward this is no longer allowed to be installed globally. You have to use it using the "npx" tool
+
+npx is a tool that came with node v5, its a package runner. it downloads and runs the latest version of a package.
+
+** To use it:
+npx create-react-app react-advanced   <-- this both downloads the latest version and creates a new create-react-app project called "react-advanced" all in one line!
+
+Also, the package for create-react-app is no longer stored globally, so it doesn't pollute the global space.
+
