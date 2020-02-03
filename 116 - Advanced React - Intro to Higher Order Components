@@ -1,0 +1,33 @@
+*********************************
+**** Higher Order Components ****
+*********************************
+
+We use Higher Order Components to reuse logic across components
+
+Example: 
+
+Lets say we have 3 components that display in our app.
+
+I want them to display a tooltip behavior of information when I hover the mouse pointer on top of them and the tooltip goes away when I move the mouse off of them.
+
+How to implement this?
+
+In the components they need some sort of state like a bool flag called "showTooltip"
+Next they should handle mouse events like mouseover and mouseout.
+In the event handlers they should change state, so they should reset the value of the bool field "showTooltip"
+Also, somewhere in the component I need to conditionally render the tooltip depending on the value of the "showTooltip" flag.
+
+Now, I have to repeat the same logic in the other 2 components and here is the problem:
+If there is a bug in the implementation or if I want to change how the tooltips work, I have to change it in each one of the components I've implemented the logic within.
+
+We use Higher Order Components to solve this problem.
+
+
+Lets imagine we have a component that we want to add tooltip functionality to.
+We create a function and pass the component as an argument to the function. 
+In that function we return a new component that wraps the original component.
+
+In that wrapper component we put all of the common functionality for showing a tooltip.
+
+Another example, lets say we have a bunch of components that fetch data from the backend. While they are waiting for data they display a loader icon.
+We can implement that common logic inside the wrapper component and that way we don't have to repreat it inside other components.
