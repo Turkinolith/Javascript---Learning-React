@@ -1,0 +1,74 @@
+***************
+**** Hooks ****
+***************
+Earlier in the course it was said:
+
+Functional components are stateless
+Class components are stateful
+If you want to store state, you have to use a class component.
+
+Well, that is NO LONGER VALID as of react 16.8!
+
+Now we can build functional components that have all the features of class components.
+Now you can use state and lifecycle features of class components.
+
+Why was this introduced? There are a few reasons.
+
+* Classes are a bit difficult for some people to understand, especially new programmers who don't have a solid foundation in object oriented programming.
+	Also, classes in JS are not like real classes found in languages like C# or JAVA.
+	
+* This keyword is confusing in JS and we have to use it all the time in class components.
+
+* Boilerplate code required. Have to write a class that extends React component, perhaps create a constructor, so on.
+
+*****************************************************************
+
+Here are 2 implementations of a very basic counter component.
+
+****** CLASS VERSION ******
+import React, { Component, Fragment } from "react";
+
+class Counter extends Component {
+  state = { count: 0 };
+
+  increaseCount = () => {
+    this.setState({ count: this.state.count + 1 });
+  };
+  render() {
+    return (
+      <Fragment>
+        <div>Count: {this.state.count}</div>
+        <button onClick={this.increaseCount}>Increase</button>
+      </Fragment>
+    );
+  }
+}
+
+export default Counter;
+
+
+******* FUNCTIONAL VERSION ***********
+import React, { Fragment, useState } from "react";
+
+function Counter2(props) {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <Fragment>
+        <div>Count: {count}</div>
+        <button onClick={() => setCount(count + 1)}>Increase</button>
+      </Fragment>
+    </div>
+  );
+}
+
+export default Counter2;
+
+
+Can immediately see the code is shorter and easier to read.
+This is the beauty of functional components, don't have to create a class, don't have to type "extends component" don't have to create constructors or call SUPER to pass the props.
+Don't have any references to "this"!
+
+Note line #4, there it calls the "useState" function. This is one of the new hooks in react 16.8.
+Next I'll go over hooks in more detail.
