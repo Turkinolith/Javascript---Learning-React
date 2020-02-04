@@ -1,0 +1,105 @@
+***********************************************
+**** Implementing a Higher Order Component ****
+***********************************************
+
+Folder - [hoc] 
+	stands for higher order components
+
+File name - [withSomething.jsx]
+	- to begin files use with-stuff
+
+What does a higher order component do? it returns a component wrapped within another component.
+
+So, a simple outline for one that will be called "withTooltip" would be like this:
+
+import React from "react";
+function withTooltip(Component) {
+  return class WithTooltip extends React.Component {
+    render() {
+      return (
+        <div>
+          <Component />
+        </div>
+      );
+    }
+  };
+}
+export default withTooltip;
+**Remember, the argument of the function needs to be capitalized for it to import/export a component.
+
+
+1 - Wrap the child with the HOC.
+In the component that I want to wrap with the HOC, I should revise the export to point to the HOC. 
+
+IE: Movie.jsx instead of "export default Movie" instead uses: export default withTooltip(Movie);   <-- with itself "Movie" as an argument.
+	*importing import withTooltip from "./withTooltip"; as well, obviously.
+
+Can verify this works by looking in developer tools, react components and view the hierarchy. App->WithTooltip->div->Movie
+
+
+2- Implement the Tooltip
+In this I need some state to determine if I should show the tooltip or not.
+state = { showTooltip: false };
+
+In the div that wraps the child component I should put some event to handle the mouseOver and mouseout events.
+<div onMouseOver={} onMouseOut={}>
+  <Component />
+</div>
+
+Now, lets make some quick event handlers:
+
+  return class WithTooltip extends React.Component {
+    state = { showTooltip: false };
+
+    mouseOver = () => {
+      this.setState({ showTooltip: true });
+    };
+
+    mouseOut = () => {
+      this.setState({ showTooltip: false });
+    };
+
+    render() {
+      return (
+        <div onMouseOver={this.mouseOver} onMouseOut={this.mouseOut}>
+
+
+Now, 
+to finalize this, lets pass the state as a props down to Component:
+
+	<div onMouseOver={this.mouseOver} onMouseOut={this.mouseOut}>
+	  <Component showTooltip={this.state.showTooltip} />
+	</div>
+
+
+3- Display the tooltip based on state.
+Back in Movie.jsx, add a computed block that displays if props is true. if tooltip is true it will show a div. Normally I'd pretty this up with some classes and CSS but this is purely to get the idea across.
+
+class Movie extends Component {
+  render() {
+    return (
+      <div>
+        Movie
+        {this.props.showTooltip && <div>Some tooltip</div>}
+      </div>
+    );
+  }
+}
+
+Now, back in the browser, as soon as I mouse over the "Movie" text, it will display the hidden div.
+
+There is a problem with this implementation.
+Let's say I add a new prop to the movie component in App.js.
+	return <Movie id={1} />;
+It doesn't display the prop set in it within the browser.
+Why is that?
+
+Because I didn't pass the props in the higher order component. Right now I'm only passing the "showTooltip" one, not any already existing.
+The fix for this is easy, use the spread operator to pass any alread existing props.
+<Component {...this.props} showTooltip={this.state.showTooltip} />
+ Now the prop passes from App.js, through withTooltip.jsx, to Movie.jsx.
+
+RECAP:
+To implement a Higher Order Component we create a new function that takes an existing component and we return a new component.
+In this case I'm returning a class component but I can also return a functional component.
+All I'm doing is implementing some logic and sharing that logic among different components.
