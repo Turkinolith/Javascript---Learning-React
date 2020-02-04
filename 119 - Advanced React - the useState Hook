@@ -1,0 +1,129 @@
+***************************
+**** The useState Hook ****
+***************************
+Using the reactjs code snippits extension -
+rsf + tab = create a new stateless named function skeleton.
+
+In this case I'll be making one for a file: Counter.jsx
+
+nothing magical there, it imports react, creates a function Counter that takes props as an argument and returns a <div>
+
+I'll add a label: <div> Counter: {} </div>
+this is where I want to display the value of the counter.
+So, I need a state and here is where I'll use a hook.
+
+A hook is a function that allows us to hook into React features like working with state or lifecycle methods.
+
+So, import from react library a hook called useState
+import React, { useState } from 'react';
+
+	*All the functions that start with "use" are examples of hooks in React.
+
+So, in the function call use state and give it an initial value such as zero. This will return an array with 2 elements, so store it in a const.
+	function Counter(props) {
+	  const arr = useState(0);
+
+**** Equivalent to "this.state.'name' " ****
+The first element in the array is the value of the counter.  arr[0] --> 0
+	This is the equivalent to: this.state.count  in a class component.
+We can store that within another const
+	const count = arr[0];
+	
+Now I can display it in the div:
+<div> Counter: {count} </div>
+
+
+**** equivalent to 'this.setState()' ****
+How would we update the value of the counter?
+Like mentioned earlier, the array returned by useState has 2 values. The first item in the array is the value. The second is a function for updating the value.
+	const setCount = arr[1];
+
+
+So now we have this:
+function Counter(props) {
+  const arr = useState(0);
+  const count = arr[0];
+  const setCount = arr[1];
+
+  return <div>Counter: {count} </div>;
+}
+
+**** Array Destructuring ****
+I can rewrite the count and setCount lines using array destructuring. Instead of declaring 2 seperate constants I can extract them straight away on the arr line.
+
+const [count, setCount] = useState(0);
+Using this setup, the first value in the array is returned as count, and the second is returned as setCount.
+
+
+*** Adjusting State ***
+lets add a button for increasing the count.
+<button onClick={() => setCount(count + 1)}>Increase</button>
+and a simple reset button:
+<button onClick={() => setCount(0)}>Reset</button>
+
+Now, there is a compile error, because both the div and the buttons need to be nested within some container. so I'll put a fragment around it.
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+
+  return (
+    <Fragment>
+      <div>Counter: {count} </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </Fragment>
+  );
+}
+
+
+*** Declare Multiple State Variables ***
+lets add an input and on change it updates the state variable.
+
+<input type='text' onChange={ e => e.target.value} />
+
+Now lets call usesetate and give it an initial value, an empty string.
+useState('')
+
+now get the result and destructure it, lets call it name and the function to update it "setName", notice the naming convention.
+const [name, setName] = useState('');
+
+So, back in the input, whene the value of the input changes we should call the setName function and pass e.target.value into it.
+<input type='text' onChange={ e => setName(e.target.value)} />
+
+Now, lets change the label of the counter to include the name of the person and say they have clicked # times.
+
+<div> {name} has clicked {count} times! </div>
+
+Code at this point:
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState("");
+
+  return (
+    <Fragment>
+      <input type="text" onChange={e => setName(e.target.value)} />
+      <div>
+        {name} has clicked {count} times!{" "}
+      </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </Fragment>
+  );
+}
+
+So this is how to declare multiple state variables.
+The values passed here are initial values. In the first case I pass a number, in the second a string, I can also pass an object, there are no limitations.
+
+There is one rule I have to follow: I can not call hooks inside loops, conditions, or nested functions.
+
+IE: I can't call a hook inside of an if statement:
+	const [count, setCount] = useState(0);
+	if (count == 0) {
+	  const [name, setName] = useState('');
+	}
+** THIS WILL NOT WORK! Because the hooks are stored sequentially and calling them in this way will mess up the order.
+
+
+
+  
