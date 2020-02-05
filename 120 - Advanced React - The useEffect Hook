@@ -1,0 +1,83 @@
+****************************
+**** The useEffect Hook ****
+****************************
+In class based components we use:
+componentDidMount(), componentDidUpdate(), and componentWillUnmount()
+The problem with them is logic tends to end up all over the place.
+
+In function based components there is a single hook:
+useEffect(func) and it does the same thing as all of the above.
+
+It takes a function and this is where we implement all the logic in a single place.
+
+So, lets take the counter component below, lets say when the component gets mounted or every time it gets updated we put the text of the div into the title.
+******************************************************
+import React, { useState, Fragment } from "react";
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState("");
+
+  return (
+    <Fragment>
+      <input type="text" onChange={e => setName(e.target.value)} />
+      <div>
+        {name} has clicked {count} times!{" "}
+      </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </Fragment>
+  );
+}
+
+export default Counter;
+******************************************************
+
+we will use the useEffect hook to hook into the lifecycle methods.
+In a class component we have: 
+	componentDidMount <- This gets called whenever a component gets mounted. 
+	componentDidUpdate <- This gets called whenever a component gets updated, whenever it receives new props or state changes.
+	
+So to use the useEffect function we pass a lambda function into it, it gets called whenever a component renders, which applies both to did mount and did update.
+If I create a lambda function that sets document.title to a template literal string, I can pass dynamic values into it.
+
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+  });
+
+I can also supply a second argument into the useEffect, that is an array of dependencies.
+The function gets called every time the component renders, you may not want the function to update each time it renders so that is where you use the dependencies for it to run.
+
+In this example I set the count variable as a dependency. Thus if I change the name variable only, it will not update, but if I change the count variable, then it will update.
+So, with this in effect I can click the [increase] button and it will update the title, and if I type into the [name] it will not update the title.
+
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+  }, [count]);
+
+Note also that it has a warning: "React Hook useEffect has a missing dependency, 'name'" So this warning is telling me that I should include name next to count. So its saying include it 
+or completely remove the array.
+
+
+In class components we have another lifecycle: componentWillUnmount.
+This is where we write clean-up like clearing timers and disconnecting from server, so on.
+
+So, in the useEffect we can optionally return a function and within it we can write all the cleanup code.
+So any previously wrote componentWillUnmount code will end up in that location.
+
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+    return () => {
+	  console.log("clean up");
+	}
+  });
+
+*Note: the way it is written, we see a "cleanup" message every time we type something in and everything rerenders, this is because the cleanup has no dependency. 
+We would not want to be disconnecting network every time the user types so we can add a dependency array on it to prevent this.
+
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+    return () => {
+	  console.log("clean up");
+	};
+  }, []);
