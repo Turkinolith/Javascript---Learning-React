@@ -1,0 +1,96 @@
+**********************
+**** Custom Hooks ****
+**********************
+Using the effect hook we can encapsulate all the logic around a certain piece of functionality in a single place. That gives an extra benefit in that we can extract that logic,
+put it in a module, and reuse it across different components. 
+
+EX: lets assume we want the behavior of being able to set the title of our document like in the previous demo.
+
+
+1.
+So, in the hooks folder lets add a new file:
+
+*note the naming convention:
+useDocumentTitle.js <- prefixed with "use" to be consistent with the hooks in react.
+
+2.
+Inside the file name a function and we copy the useEffect code into it.
+function useDocumentTitle() {
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+    return () => {
+	  console.log("clean up");
+	};
+  }, []);
+}
+
+3. 
+So, we have the call to the useEffect function, so it needs imported on the top.
+
+import { useEffect } from 'react';
+
+function useDocumentTitle() {
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} times!`;
+    return () => {
+	  console.log("clean up");
+	};
+  }, []);
+}
+
+4.
+To make this more reusable, instead of hardcoding the document.title message we can give it a parameter = title and then set it.
+
+import { useEffect } from 'react';
+
+function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+    return () => {
+	  console.log("clean up");
+	};
+  }, []);
+}
+
+**Technically we don't need the cleanup code as that was purely for demonstration, but I'll leave it there for noting that later on.
+
+
+5.
+Also make sure to remove the empty array of dependency or it'll never get called.
+
+import { useEffect } from 'react';
+
+function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+    return () => {
+	  console.log("clean up");
+	};
+  });
+}
+
+
+6. 
+Finally, need to export this.
+
+import { useEffect } from 'react';
+
+export default function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+    return () => {
+	  console.log("clean up");
+	};
+  });
+}
+
+
+7. 
+Now, its an exported and reusable piece of functionality. Can go into the counter component and use it.
+
+import useDocumentTitle from './useDocumentTitle';
+useDocumentTitle(`${name} has clicked ${count} times!`);
+
+
+Now if I need to change the behavior there is a single place where I need to make the changes.
+This is how we can use a custom hook.
