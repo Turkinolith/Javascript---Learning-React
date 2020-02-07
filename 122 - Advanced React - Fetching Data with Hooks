@@ -1,0 +1,120 @@
+**********************************
+**** Fetching Data with Hooks ****
+**********************************
+In this demo I'll put everything already covered together and build a real component.
+It'll use the REST API at jsonplaceholder.typicode.com to get data from the /users endpoint.
+
+1.
+In the hooks folder I'll add a new file: Users.jsx.
+
+2. 
+I'll generate a functional component. 
+"rsf"
+
+3.
+Now I'll make an API call to JSON placeholder and will use axios again for this.
+npm i axios
+
+4.
+import it at the top:
+import axios from 'axios';
+
+5.
+In a class component we should make an API call in the componentDidMount method, that is when our component is mounted in the DOM.
+In functional components we don't have that, so we use the useEffect() hook.
+Inside of this we should call axios and pass the URL of our endpoint.  https://jsonplaceholder.typicode.com/users
+This returns a promise so it would be best to await it, then save the result
+
+  useEffect( () => {
+    const result = await axios('https://jsonplaceholder.typicode.com/users')
+  });
+
+6.
+Result.data returns the array of user objects we get from the server. I should store that array in the state of the component. So here I use the state hook:
+I give it an initial value, in this case an empty array.
+useState([]);
+This will return an array with 2 items, so lets destructure it. Remember the first value is the data, the 2nd is a function to update the data.
+const [users, setUsers] = useState([]);
+
+Now, I'll call setUsers and pass the result.data.
+setUsers(result.data);
+
+
+7.
+Now, there is a problem.
+Because I declared "await" in the axios call I need to decorate the lambda function with async, but react doesn't allow this.
+The function that I pass to useEffect has to be a regular function.
+
+To solve this, I can encapsulate the lines below within an async function.
+const result = axios('https://jsonplaceholder.typicode.com/users');
+setUsers(result.data);
+
+It'll look like this:
+    useEffect( () => {
+        async function getUsers() {
+            const result = await axios('https://jsonplaceholder.typicode.com/users');
+            setUsers(result.data);
+        }
+
+      });
+
+
+So, inside the callback function we are defining another function. 
+But, this function won't be called automatically, I have to explicitly call it.
+
+useEffect( () => {
+	async function getUsers() {
+		const result = await axios('https://jsonplaceholder.typicode.com/users');
+		setUsers(result.data);
+	}
+	getUsers();
+});
+
+8.
+Now, I don't want to await the call for "getUsers()" because then I'll have the same problem with needing to also async the lambda function.
+So, I simply call it.
+
+At some point the awaited axios line of the code gets resolved so the control then moves to the "setUsers(result.data) line, it'll set the state variable and cause the component to re-render.
+
+9.
+Lets render the result:
+  return (
+    <div>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+
+10:
+Test the component by loading up my server and editing app.js to point towards the new users component. Verified that I get a list of users, perfect!
+Code for the Users.jsx componet:
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+function Users(props) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function getUsers() {
+      const result = await axios("https://jsonplaceholder.typicode.com/users");
+      setUsers(result.data);
+    }
+    getUsers();
+  });
+
+  return (
+    <div>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Users;
