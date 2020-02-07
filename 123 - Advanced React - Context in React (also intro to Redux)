@@ -1,0 +1,31 @@
+************************************************
+**** Context in React (also intro to Redux) ****
+************************************************
+
+There is a common problem in React:
+Prop Drilling.
+
+Prop drilling in an example:
+Lets say we have a 3 tier component tree. Top is an object that represents the currentUser. Lets say in the 3rd component down we want to access the current user.
+To do this we have to pass the object as a prop through the middle component so that we can access it in the 3rd component down. 
+This is because at every level we have to drill a hole to pass a prop. Over time as the app grows and we have more data to share this approach becomes unmaintainable.
+
+
+A few years ago before we had context, the tool "Redux" was created to solve this problem. Redux brings some additional features, but it was created to solve this particular problem.
+
+With redux we don't have to drill properties at every level. Instead we have a concept called "Store" which is an object that stores the global state of our application.
+That is, the data we want to share across diffrent components.
+
+In the first component we can store the currentUser to the store, then pull it out in the 3rd component down directly without having to pass it as a prop through the 2nd component.
+That is, any component can get data from the Store. That is the idea behind Redux.
+It is pretty large and will be its own thing to learn, but it brings a lot of complexity into a project.
+
+So, a few years later the React team introduced a new concept into React, Context.
+
+With context we can pass data down the prop tree without drilling.
+So, in the top component we can provide some context, some shared data, then in the bottom component we consume that context.
+
+When using this feature we deal with:
+Providers and Consumers
+
+First, will look at using context in Class Components.
