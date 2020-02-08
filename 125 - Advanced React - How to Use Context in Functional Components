@@ -1,0 +1,64 @@
+*****************************************************
+**** How to use Context in Functional Components ****
+*****************************************************
+**NOTE: This covers using context, providing context is the same as in class components:
+The provider always needs to exist as a wrapper around the parent element no matter how you choose to consume the value.
+IE:
+	import react from 'react';
+	import HomePage from './HomePage';
+	import { UserProvider } from './UserContext';
+	
+	function App() {
+		const user = { name: 'Larry', loggedIn: true }
+		
+		return (
+		  <UserProvider value={user}>
+			<HomePage />
+		  </UserProvider>
+		);
+	}
+
+
+It is a lot easier to use Context in Functional Components than in Class based ones.
+This will continue to use the same set-up as in the Class based example with the App->Movie_Page->Movie_List structure,
+But will extend it with a new component: Movie_Row.jsx that chains off of Movie_List
+
+#1
+	To Generate a new functional component use: rsf (the addon shorthand for react stateless function)
+	The addon will auto name it to MovieRow.
+
+#2
+	To use the Context import it on the top.
+		import UserContext from './userContext';
+
+#3
+	There is a special hook called "useContext" so that needs to be pulled out from the React module.
+	*NOTE: This hook only works with functional components.
+		import React, {useContext} from 'react';
+
+#4
+	Inside the function, call useContext and pass UserContext as an argument.
+		useContext(UserContext);
+	This returns the user context object, so we can store that within a variable or use it directly.
+		const currentUser = useContext(UserContext);
+	
+	Now, in this function I can do whatever I want with that object. 
+		Log it on the console:
+			console.log("context", currentUser);
+		Or, render the name of the current user.
+			return <div>{currentUser.name}</div>;
+			
+#5
+	Now, I'll add the MovieRow component into the output of the MovieList component from last lesson:
+	
+		render() {
+		  return (
+		    <UserContext.Consumer>
+			  {userContext => <div>Movie List {userContext.name} <MovieRow /></div>}
+			</UserContext.Consumer>
+		  );
+		}
+
+If you view the components tab in Dev Tools, you'll see one immediate advantage to using context in a funcitonal component is that 
+it does not generate an extra "context.consumer" child component after MovieRow. This way the component list doesn't get polluted with children components
+like it would with class based context.
