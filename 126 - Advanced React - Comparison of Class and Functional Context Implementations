@@ -1,0 +1,98 @@
+***********************************************************
+COMPARISON OF CLASS AND FUNCTIONAL CONTEXT IMPLEMINTATIONS
+***********************************************************
+To use context in a class based component I had to:
+
+#1 - Set a static property.
+#2 - Add a consumer component that made the component tree a bit convoluted.
+#3 - Use a function in the Context.Consumer component, which is distracting from seeing the actual content of the method. It adds extra complexity.
+
+To use context in a functional component I had to:
+
+#1 - Call the useContext() hook.
+
+
+In BOTH I needed to: 
+
+#1 - Create a context file to serve the context object. 
+  * - remember to use Pascal naming convention!
+  * - remember to set the displayName!
+#2 - Import the context file to the parent file and wrap its return element with the context provider.
+
+
+
+Example set-up:
+Files-
+[App.js, MoviePage.jsx, MovieList.jsx, userContext.js]
+
+
+****************
+**** App.js ****
+****************
+
+import React from "react";
+import UserContext from "./context/userContext";
+import MoviePage from "./context_example/MoviePage";
+
+function App() {
+  const AppState = { name: "Larry" };
+
+  return (
+    <UserContext.Provider value={AppState}>
+      <MoviePage />
+    </UserContext.Provider>
+  );
+}
+
+export default App;
+
+
+
+************************
+**** userContext.js ****
+************************
+
+import React from "react";
+
+const UserContext = React.createContext();
+UserContext.displayName = "UserContext";
+
+export default UserContext;
+
+
+
+***********************
+**** MoviePage.jsx ****
+***********************
+
+import React, { Component } from "react";
+import MovieList from "./MovieList";
+
+class MoviePage extends Component {
+  render() {
+    return (
+      <div>
+        <MovieList />
+      </div>
+    );
+  }
+}
+
+export default MoviePage;
+
+
+
+***********************
+**** MovieList.jsx ****
+***********************
+
+import React, { useContext } from "react";
+import UserContext from "./../context/userContext";
+
+function MovieList(props) {
+  const UserName = useContext(UserContext);
+
+  return <div>SFC Movie List and user is {UserName.name}</div>;
+}
+
+export default MovieList;
