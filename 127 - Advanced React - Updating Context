@@ -1,0 +1,132 @@
+**************************
+**** Updating the Context ****
+******************************
+In the previous lessons I've covered consuming the context. But what if I want to update it? I'll use the same examples to cover this.
+
+In the previous lessons I assumed that the user was initially logged-in when the components were loaded. 
+I'll change this behavior and simulate the scenario where the user is not logged in, then build a log-in component with a button. When I press the button the user 
+should log in and then I should see the users name appear.
+
+So, how to update the context?
+Lets look at the App component. There I'm providing the userContext which is the value of AppState
+<UserContext.Provider value={AppState}>
+
+Forget about context, how to update the state of a component higher in the component tree?
+Since the state is here, Usually I'd have a method to update the state here and pass access to that update down with props.
+
+
+
+Unlike in the instructor video, I'm keeping my App.js as a functional component so I can continue to learn the state adjustments.
+
+1.
+	First I define my state like I do with functional components using the useState method and I init it to an initial object with the property name set to a null value.
+	
+		function App() {
+		  const [users, setUsers] = useState({ name: null });
+
+
+2. 
+	I'll add a method called: handleLoggedIn
+	So, I define handleLoggedIn as a constant, I fake the HTTP call and define the result as an object { name: "Larry" };
+	Then I use the setUsers paramter from setting the state to update it.
+	
+		const handleLoggedIn = username => {
+			console.log("GETTING the user: " + username);
+			const user = { name: "Larry" };
+			setUsers(user);
+		};
+
+3.
+	Next, I'll change the structure of the context provider, instead of passing just the value of users I'll instead pass an object that has 2 parameters:
+	First the currentUser: which is set to users, then onLoggedIn: which is set to the handleLoggedIn function.
+	
+		  return (
+			<UserContext.Provider
+			  value={{ currentUser: users, onLoggedIn: handleLoggedIn }}
+			>
+			  <MoviePage />
+			  <Login />
+			</UserContext.Provider>
+		  );
+		}
+
+4. 
+	Since I changed the result of the context being passed down, I'll need to go and rewrite all of the code that I used to interface with it so that I 
+	get the expected values. (Also a good time to clean up some of the namings I'm working with.)
+	Also, to address the issue where I may get "falsy" values from the state now, I use ternary operators to either fill in the value or replace it with an empty string.
+	
+	MoviePage is unchanged.
+	
+	MovieList.jsx is now:
+		import React, { useContext } from "react";
+		import UserContext from "./../context/userContext";
+		import MovieRow from "./MovieRow";
+
+		function MovieList(props) {
+		  const Context = useContext(UserContext);
+
+		  return (
+			<div>
+			  <div>
+				SFC Movie List and user is{" "}
+				{Context.currentUser ? Context.currentUser.name : ""}
+			  </div>
+			  <MovieRow />
+			</div>
+		  );
+		}
+
+		export default MovieList;
+	
+	MovieRow.jsx is now:
+	import React, { useContext } from "react";
+	import UserContext from "./../context/userContext";
+
+	function MovieRow(props) {
+	  const Context = useContext(UserContext);
+
+	  function backwards(input) {
+		return input
+		  .split("")
+		  .reverse()
+		  .join("");
+	  }
+
+	  return (
+		<div>
+		  SFC Movie Row{" "}
+		  {backwards(Context.currentUser.name ? Context.currentUser.name : "")}
+		</div>
+	  );
+	}
+
+	export default MovieRow;
+	
+5.
+	And now to make the login component referenced on App.js. 
+	I import the useContext hook and use it there to import the context object that I want, UserContext in this case.
+	Note that in the onClick I'm calling the "onLoggedIn" parameter I passed via context,
+	not the "handleLoggedIn" function name. Note that the "username" part doesn't really need to be username, its a placeholder for now so could be anything.
+	So, when the user clicks the button, the onLoggedIn from context triggers, causing the handleLoggedIn method on App.js to execute. This is where we get the user information
+	from the "server" and then we update the state. 
+	Once the state updates, the value prop for context is also updated, which notifies all consumers using it which in turn refresh themselves.
+	
+		import React, { useContext } from "react";
+		import UserContext from "../context/userContext";
+
+		function Login(props) {
+		  const userContext = useContext(UserContext);
+		  return (
+			<div>
+			  <button onClick={() => userContext.onLoggedIn("username")}>Login</button>
+			</div>
+		  );
+		}
+
+		export default Login;
+
+RECAP:
+	To update the context I added the handleLoggedIn method to the component that held the state, this method is the one responsible for updating the state.
+	I then passed the method down using the Context object. That way any component in the component tree can access the method just like they can access the current user.
+	
+	
