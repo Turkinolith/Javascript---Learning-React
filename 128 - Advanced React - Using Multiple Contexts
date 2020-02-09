@@ -1,0 +1,57 @@
+
+*************************************
+**** Consuming Multiple Contexts ****
+*************************************
+Often in an app you may want to create different types of contexts.
+For example I'll add an idea of a shopping cart. The concept of a shopping cart is different than that of a user so its not something that I'd want to 
+add to the existing user context.
+
+#1
+	So, I'll add a new file: cartContext.js
+	To save time I'll copy the info from "userContext" and paste it in, renaming things.
+
+#2
+	Now to provide this context. So Go to app.js, 
+	import CartContext
+	in the Render Method just like I provided the UserContext I add CartContext.provide, including the already existing context provider.
+	
+		<CartContext.Provider>
+		  <UserContext.Provider
+	
+#3	
+	Now, what sort of value should I set?
+	Lets set it to an object with a property "cart:" with the value set to an array.
+		<CartContext.Provider value={{ cart: [] }}>
+
+#4
+	Lets consume the context, I can pass it down to any child in the chain, so I'll go to MovieRow.jsx.
+	There, I'll duplicate the context consume line and point it to CartContext
+	To verify that everything loaded, simply console.log cartContext
+  
+    import React, { useContext } from "react";
+    import UserContext from "./../context/userContext";
+    import CartContext from "../context/cartContext";
+    
+	  function MovieRow(props) {
+    const userContext = useContext(UserContext);
+    const cartContext = useContext(CartContext);
+
+    function backwards(input) {
+      return input
+        .split("")
+        .reverse()
+        .join("");
+    }
+
+    console.log("Cart Context: ", cartContext);
+	  return (
+        <div>
+          SFC Movie Row{" "}
+          {backwards(
+            userContext.currentUser.name ? userContext.currentUser.name : ""
+          )}
+        </div>
+      );
+    }
+
+    export default MovieRow;
